@@ -208,8 +208,9 @@
         <div class="flex items-center justify-between mb-4">
           <div id="progress" class="text-sm text-gray-400"></div>
         </div>
-        <div id="questionPrompt" class="text-center">
-          <div id="promptBig" class="text-7xl font-bold mb-4 leading-none opacity-0 transition-opacity duration-200"></div>
+        <div id="questionPrompt" class="text-center transition-opacity duration-500">
+          <div id="promptBig" class="text-7xl font-bold mb-4 leading-none opacity-0 transition-opacity duration-200">
+          </div>
           <div id="promptHint" class="text-gray-400 text-sm mb-4"></div>
           <div id="feedback" class="text-3xl font-semibold mb-4 transition-opacity duration-500"></div>
 
@@ -361,6 +362,20 @@
       }
     }
 
+    function fadeOutQA(cb) {
+      // fade whole question area (prompt + hint + feedback + answers)
+      questionPromptEl.style.opacity = '0';
+      // wait for CSS transition (500ms) + a tiny buffer
+      setTimeout(cb, 550);
+    }
+
+    function fadeInQA() {
+      questionPromptEl.style.opacity = '0';
+      // next tick to trigger the transition properly
+      requestAnimationFrame(() => {
+        questionPromptEl.style.opacity = '1';
+      });
+    }
 
     // ===== State =====
     const state = {
@@ -398,7 +413,7 @@
     const correctGlyph = $('#correctGlyph');
     const selfMarkRight = $('#selfMarkRight');
     const selfMarkWrong = $('#selfMarkWrong');
-
+    const questionPromptEl = $('#questionPrompt');
     const scoreSummary = $('#scoreSummary');
     const wrongAnswersDiv = $('#wrongAnswers');
     const backToMenu = $('#backToMenu');
@@ -608,18 +623,15 @@
       progressEl.textContent = `Question ${i + 1} / ${total}`;
       feedbackEl.textContent = '';
       feedbackEl.className = '';
+      //start hidden
+      questionPromptEl.style.opacity = '0';
 
       const q = state.questions[i];
       promptBig.textContent = q.prompt;
       promptHint.textContent = q.hint;
-      promptBig.style.opacity = '0';
 
       detachMCShortcuts();
 
-      requestAnimationFrame(() => {
-        promptBig.style.opacity = '1';
-      });
-      
       // reset UI
       textAnswerWrap.classList.add('hidden');
       mcWrap.classList.add('hidden');
@@ -679,32 +691,24 @@
     function briefFeedback(ok) {
       feedbackEl.textContent = ok ? '✅' : '❌';
       feedbackEl.className = ok
-        ? 'text-3xl font-semibold mb-4 text-green-400 transition-opacity duration-500'
-        : 'text-3xl font-semibold mb-4 text-red-400 transition-opacity duration-500';
-      feedbackEl.style.opacity = '1';
-
-      // After 400ms, start fading out
-      setTimeout(() => {
-        feedbackEl.style.opacity = '0';
-      }, 400);
-
-      // Reset so it's ready for the next question
-      setTimeout(() => {
-        feedbackEl.textContent = '';
-        feedbackEl.style.opacity = '1';
-      }, 800);
+        ? 'text-3xl font-semibold mb-4 text-green-400'
+        : 'text-3xl font-semibold mb-4 text-red-400';
     }
 
-    function advance() {
+    function finishQuestionAndAdvance() {
       detachMCShortcuts();
-      setTimeout(() => {
+      fadeOutQA(() => {
+        // clear feedback text before next render
+        feedbackEl.textContent = '';
         state.index++;
-        if (state.index < state.questions.length) {
-          renderQuestion();
-        } else {
+        if (state.index >= state.questions.length) {
           showScore();
+          return;
         }
-      }, 600);
+        renderQuestion();
+        // quick fade-in of the new screen
+        fadeInQA();
+      });
     }
 
     // Text answers
@@ -720,7 +724,7 @@
           state.score++;
         }
         briefFeedback(ok);
-        setTimeout(advance, 600);
+        finishQuestionAndAdvance();
       }
     });
 
@@ -732,7 +736,7 @@
         state.score++;
       }
       briefFeedback(ok);
-      setTimeout(advance, 600);
+      finishQuestionAndAdvance();
     }
 
     // Drawing mode
@@ -796,13 +800,13 @@
     selfMarkRight.addEventListener('click', () => {
       state.score++;
       briefFeedback(true);
-      setTimeout(advance, 400);
+      finishQuestionAndAdvance();
     });
     selfMarkWrong.addEventListener('click', () => {
       const q = state.questions[state.index];
       state.wrong.push({ prompt: q.prompt, user: '[drawing]', correct: q.correct });
       briefFeedback(false);
-      setTimeout(advance, 400);
+      finishQuestionAndAdvance();
     });
 
     // Score Screen
