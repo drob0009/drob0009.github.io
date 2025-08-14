@@ -208,7 +208,7 @@
         <div class="flex items-center justify-between mb-4">
           <div id="progress" class="text-sm text-gray-400"></div>
         </div>
-        <div id="questionPrompt" class="text-center transition-opacity duration-1000">
+        <div id="questionPrompt" class="text-center transition-opacity duration-500">
           <div id="promptBig" class="text-7xl font-bold mb-4 leading-none">
           </div>
           <div id="promptHint" class="text-gray-400 text-sm mb-4"></div>
@@ -366,7 +366,7 @@
       // fade whole question area (prompt + hint + feedback + answers)
       questionPromptEl.style.opacity = '0';
       // wait for CSS transition (500ms) + a tiny buffer
-      setTimeout(cb, 1050);
+      setTimeout(cb, 550);
     }
 
     function fadeInQA() {
@@ -712,7 +712,7 @@
           // quick fade-in of the new screen
           fadeInQA();
         });
-      }, 400);
+      }, 200);
     }
 
     // Text answers
