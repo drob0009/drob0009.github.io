@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kana Quiz</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Simple canvas styling */
+    #drawCanvas { touch-action: none; }
+    .btn { @apply px-4 py-2 rounded font-medium transition; }
+    .btn-primary { @apply bg-blue-500 text-white hover:bg-blue-600; }
+    .btn-secondary { @apply bg-gray-700 text-gray-100 hover:bg-gray-600; }
+    .btn-danger { @apply bg-red-600 text-white hover:bg-red-700; }
+    .badge { @apply rounded px-2 py-0.5 text-xs font-semibold; }
+    .disabled { @apply opacity-50 pointer-events-none; }
+  </style>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen">
+  <div class="max-w-3xl mx-auto p-6">
+    <header class="mb-6 text-center">
+      <h1 class="text-3xl font-bold">Kana Quiz</h1>
+      <p class="text-sm text-gray-400">Hiragana • Katakana • Romaji</p>
+    </header>
+
+    <!-- Main Menu / Options -->
+    <section id="mainMenu" class="space-y-6">
+      <!-- Quiz Type -->
+      <div class="bg-gray-800 shadow-sm rounded-2xl p-5">
+        <h2 class="text-xl font-semibold mb-4">Quiz Type</h2>
+        <div class="grid gap-3 sm:grid-cols-2">
+          <label class="flex items-center gap-3 border border-gray-700 rounded-xl p-3 cursor-pointer">
+            <input type="radio" name="quizType" value="kataToRoma" class="w-4 h-4" checked>
+            <span>Katakana ➜ Romaji</span>
+          </label>
+          <label class="flex items-center gap-3 border border-gray-700 rounded-xl p-3 cursor-pointer">
+            <input type="radio" name="quizType" value="hiraToRoma" class="w-4 h-4">
+            <span>Hiragana ➜ Romaji</span>
+          </label>
+          <label class="flex items-center gap-3 border border-gray-700 rounded-xl p-3 cursor-pointer">
+            <input type="radio" name="quizType" value="mixedToRoma" class="w-4 h-4">
+            <span>Mixed Kana (ひ/カ) ➜ Romaji</span>
+          </label>
+          <label class="flex items-center gap-3 border border-gray-700 rounded-xl p-3 cursor-pointer">
+            <input type="radio" name="quizType" value="hiraToKata" class="w-4 h-4">
+            <span>Hiragana ➜ Katakana</span>
+          </label>
+          <label class="flex items-center gap-3 border border-gray-700 rounded-xl p-3 cursor-pointer">
+            <input type="radio" name="quizType" value="kataToHira" class="w-4 h-4">
+            <span>Katakana ➜ Hiragana</span>
+          </label>
+          <label class="flex items-center gap-3 border border-gray-700 rounded-xl p-3 cursor-pointer">
+            <input type="radio" name="quizType" value="romaToHira" class="w-4 h-4">
+            <span>Romaji ➜ Hiragana</span>
+          </label>
+          <label class="flex items-center gap-3 border border-gray-700 rounded-xl p-3 cursor-pointer">
+            <input type="radio" name="quizType" value="romaToKata" class="w-4 h-4">
+            <span>Romaji ➜ Katakana</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Answer Mode -->
+      <div class="bg-gray-800 shadow-sm rounded-2xl p-5">
+        <h2 class="text-xl font-semibold mb-3">Answer Mode</h2>
+        <p class="text-sm text-gray-400 mb-3" id="answerModeHint">
+          Typing is only allowed when the answer is Romaji. For Kana answers, use Multiple Choice or Drawing.
+        </p>
+        <div class="grid sm:grid-cols-3 gap-3" id="answerModeGroup">
+          <label id="modeTextLabel" class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
+            <input type="radio" name="answerMode" value="text" id="answerModeText" class="w-4 h-4">
+            <span>Typing</span>
+          </label>
+          <label id="modeMCLabel" class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
+            <input type="radio" name="answerMode" value="mc" id="answerModeMC" class="w-4 h-4" checked>
+            <span>Multiple Choice</span>
+          </label>
+          <label id="modeDrawLabel" class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
+            <input type="radio" name="answerMode" value="draw" id="answerModeDraw" class="w-4 h-4">
+            <span>Drawing</span>
+          </label>
+        </div>
+
+        <!-- Distractor pool toggle (for Kana MC only) -->
+        <div id="distractorRow" class="mt-4">
+          <label id="distractorLabel" class="flex items-center gap-2 border border-gray-700 rounded-xl p-3">
+            <input type="checkbox" id="distractorSelectedOnly" class="w-4 h-4" />
+            <span>Only use selected character pools for distractors (still both scripts)</span>
+          </label>
+          <p class="text-xs text-gray-500 mt-2">
+            When unchecked (default), distractors come from all kana (hiragana + katakana).
+          </p>
+        </div>
+      </div>
+
+      <!-- Character Pools -->
+      <div class="bg-gray-800 shadow-sm rounded-2xl p-5">
+        <h2 class="text-xl font-semibold mb-3">Character Pools</h2>
+        <p class="text-sm text-gray-400 mb-3">Select one or more:</p>
+        <div class="grid sm:grid-cols-3 gap-3">
+          <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
+            <input type="checkbox" class="charPool w-4 h-4" value="vowels" />
+            <span>Vowels (a, i, u, e, o)</span>
+          </label>
+
+          <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
+            <input type="checkbox" class="charPool w-4 h-4" value="k" />
+            <span>K row (ka, ki, ku, ke, ko)</span>
+          </label>
+          <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
+            <input type="checkbox" class="charPool w-4 h-4" value="s" />
+            <span>S row (sa, shi, su, se, so)</span>
+          </label>
+          <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
+            <input type="checkbox" class="charPool w-4 h-4" value="t" />
+            <span>T row (ta, chi, tsu, te, to)</span>
+          </label>
+          <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
+            <input type="checkbox" class="charPool w-4 h-4" value="n" />
+            <span>N row (na, ni, nu, ne, no)</span>
+          </label>
+          <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
+            <input type="checkbox" class="charPool w-4 h-4" value="h" />
+            <span>H row (ha, hi, fu, he, ho)</span>
+          </label>
+          <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
+            <input type="checkbox" class="charPool w-4 h-4" value="m" />
+            <span>M row (ma, mi, mu, me, mo)</span>
+          </label>
+          <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
+            <input type="checkbox" class="charPool w-4 h-4" value="y" />
+            <span>Y row (ya, yu, yo)</span>
+          </label>
+          <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
+            <input type="checkbox" class="charPool w-4 h-4" value="r" />
+            <span>R row (ra, ri, ru, re, ro)</span>
+          </label>
+          <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
+            <input type="checkbox" class="charPool w-4 h-4" value="w" />
+            <span>W row (wa, wo)</span>
+          </label>
+
+          <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
+            <input type="checkbox" class="charPool w-4 h-4" value="special" />
+            <span>Special (n)</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Repetitions -->
+      <div class="bg-gray-800 shadow-sm rounded-2xl p-5">
+        <h2 class="text-xl font-semibold mb-3">Repetitions</h2>
+        <div class="flex items-center gap-3">
+          <input type="number" id="repetitions" min="1" value="1" class="w-28 p-2 border border-gray-700 rounded bg-gray-900 text-gray-100" />
+          <span class="text-sm text-gray-400">Each picked character appears this many times.</span>
+        </div>
+      </div>
+
+      <div class="flex justify-end">
+        <button id="startQuiz" class="btn btn-primary w-full sm:w-auto">Start Quiz</button>
+      </div>
+    </section>
+
+    <!-- Quiz Screen -->
+    <section id="quizScreen" class="hidden">
+      <div class="bg-gray-800 shadow-sm rounded-2xl p-5">
+        <div class="flex items-center justify-between mb-4">
+          <div id="progress" class="text-sm text-gray-400"></div>
+          <div id="feedback" class="text-2xl"></div>
+        </div>
+        <div id="questionPrompt" class="text-center">
+          <div id="promptBig" class="text-7xl font-bold mb-4 leading-none"></div>
+          <div id="promptHint" class="text-gray-400 text-sm mb-4"></div>
+
+          <!-- Text input answer -->
+          <div id="textAnswerWrap" class="mb-4 hidden">
+            <input id="textAnswer" type="text" class="w-full text-center text-xl p-3 border border-gray-700 rounded bg-gray-900 text-gray-100" placeholder="Type answer and press Enter" />
+          </div>
+
+          <!-- Multiple choice answer -->
+          <div id="mcWrap" class="grid grid-cols-2 gap-3 hidden"></div>
+
+          <!-- Drawing answer -->
+          <div id="drawWrap" class="hidden">
+            <canvas id="drawCanvas" class="border border-gray-700 rounded-xl w-full max-w-md h-64 mx-auto bg-gray-900"></canvas>
+            <div class="flex justify-center gap-2 mt-3">
+              <button id="clearCanvas" class="btn btn-secondary">Clear</button>
+              <button id="revealCorrect" class="btn btn-secondary">Reveal Correct</button>
+            </div>
+            <div id="revealArea" class="mt-4 hidden text-center">
+              <p class="text-sm text-gray-400 mb-1">Correct character:</p>
+              <div id="correctGlyph" class="text-7xl font-bold"></div>
+              <div class="flex justify-center gap-2 mt-3">
+                <button id="selfMarkRight" class="btn btn-primary">I was right</button>
+                <button id="selfMarkWrong" class="btn btn-danger">I was wrong</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Score Screen -->
+    <section id="scoreScreen" class="hidden">
+      <div class="bg-gray-800 shadow-sm rounded-2xl p-5">
+        <h2 class="text-2xl font-bold mb-2">Your Score</h2>
+        <p id="scoreSummary" class="text-lg mb-4"></p>
+        <div id="wrongAnswers" class="space-y-2 mb-6"></div>
+        <div class="flex justify-end">
+          <button id="backToMenu" class="btn btn-primary">Back to Menu</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // ===== Data =====
+    // Basic gojūon set (no dakuten/handakuten; wo kept as 'wo', fu for ふ).
+    // Categories: vowels, k, s, t, n, h, m, y, r, w, special
+    const KANA = [
+      // Vowels
+      { r: 'a',  h: 'あ', k: 'ア', cat: 'vowels' },
+      { r: 'i',  h: 'い', k: 'イ', cat: 'vowels' },
+      { r: 'u',  h: 'う', k: 'ウ', cat: 'vowels' },
+      { r: 'e',  h: 'え', k: 'エ', cat: 'vowels' },
+      { r: 'o',  h: 'お', k: 'オ', cat: 'vowels' },
+      // K row
+      { r: 'ka', h: 'か', k: 'カ', cat: 'k' },
+      { r: 'ki', h: 'き', k: 'キ', cat: 'k' },
+      { r: 'ku', h: 'く', k: 'ク', cat: 'k' },
+      { r: 'ke', h: 'け', k: 'ケ', cat: 'k' },
+      { r: 'ko', h: 'こ', k: 'コ', cat: 'k' },
+      // S row
+      { r: 'sa', h: 'さ', k: 'サ', cat: 's' },
+      { r: 'shi',h: 'し', k: 'シ', cat: 's' },
+      { r: 'su', h: 'す', k: 'ス', cat: 's' },
+      { r: 'se', h: 'せ', k: 'セ', cat: 's' },
+      { r: 'so', h: 'そ', k: 'ソ', cat: 's' },
+      // T row
+      { r: 'ta', h: 'た', k: 'タ', cat: 't' },
+      { r: 'chi',h: 'ち', k: 'チ', cat: 't' },
+      { r: 'tsu',h: 'つ', k: 'ツ', cat: 't' },
+      { r: 'te', h: 'て', k: 'テ', cat: 't' },
+      { r: 'to', h: 'と', k: 'ト', cat: 't' },
+      // N row
+      { r: 'na', h: 'な', k: 'ナ', cat: 'n' },
+      { r: 'ni', h: 'に', k: 'ニ', cat: 'n' },
+      { r: 'nu', h: 'ぬ', k: 'ヌ', cat: 'n' },
+      { r: 'ne', h: 'ね', k: 'ネ', cat: 'n' },
+      { r: 'no', h: 'の', k: 'ノ', cat: 'n' },
+      // H row
+      { r: 'ha', h: 'は', k: 'ハ', cat: 'h' },
+      { r: 'hi', h: 'ひ', k: 'ヒ', cat: 'h' },
+      { r: 'fu', h: 'ふ', k: 'フ', cat: 'h' },
+      { r: 'he', h: 'へ', k: 'ヘ', cat: 'h' },
+      { r: 'ho', h: 'ほ', k: 'ホ', cat: 'h' },
+      // M row
+      { r: 'ma', h: 'ま', k: 'マ', cat: 'm' },
+      { r: 'mi', h: 'み', k: 'ミ', cat: 'm' },
+      { r: 'mu', h: 'む', k: 'ム', cat: 'm' },
+      { r: 'me', h: 'め', k: 'メ', cat: 'm' },
+      { r: 'mo', h: 'も', k: 'モ', cat: 'm' },
+      // Y row
+      { r: 'ya', h: 'や', k: 'ヤ', cat: 'y' },
+      { r: 'yu', h: 'ゆ', k: 'ユ', cat: 'y' },
+      { r: 'yo', h: 'よ', k: 'ヨ', cat: 'y' },
+      // R row
+      { r: 'ra', h: 'ら', k: 'ラ', cat: 'r' },
+      { r: 'ri', h: 'り', k: 'リ', cat: 'r' },
+      { r: 'ru', h: 'る', k: 'ル', cat: 'r' },
+      { r: 're', h: 'れ', k: 'レ', cat: 'r' },
+      { r: 'ro', h: 'ろ', k: 'ロ', cat: 'r' },
+      // W row
+      { r: 'wa', h: 'わ', k: 'ワ', cat: 'w' },
+      { r: 'wo', h: 'を', k: 'ヲ', cat: 'w' },
+      // Special
+      { r: 'n',  h: 'ん', k: 'ン', cat: 'special' },
+    ];
+
+    // ===== Helpers =====
+    const $ = (sel) => document.querySelector(sel);
+    const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+
+    function shuffle(arr){
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function sample(arr, n){
+      const copy = arr.slice();
+      shuffle(copy);
+      return copy.slice(0, n);
+    }
+
+    // ===== State =====
+    const state = {
+      quizType: 'kataToRoma',
+      poolCats: [],
+      repetitions: 1,
+      answerMode: 'mc', // 'text' | 'mc' | 'draw'
+      questions: [],
+      index: 0,
+      score: 0,
+      wrong: [] // {prompt, user, correct, note}
+    };
+
+    // ===== UI Refs =====
+    const mainMenu = $('#mainMenu');
+    const quizScreen = $('#quizScreen');
+    const scoreScreen = $('#scoreScreen');
+
+    const startBtn = $('#startQuiz');
+    const progressEl = $('#progress');
+    const feedbackEl = $('#feedback');
+    const promptBig = $('#promptBig');
+    const promptHint = $('#promptHint');
+
+    const textAnswerWrap = $('#textAnswerWrap');
+    const textAnswer = $('#textAnswer');
+
+    const mcWrap = $('#mcWrap');
+
+    const drawWrap = $('#drawWrap');
+    const drawCanvas = $('#drawCanvas');
+    const clearCanvasBtn = $('#clearCanvas');
+    const revealBtn = $('#revealCorrect');
+    const revealArea = $('#revealArea');
+    const correctGlyph = $('#correctGlyph');
+    const selfMarkRight = $('#selfMarkRight');
+    const selfMarkWrong = $('#selfMarkWrong');
+
+    const scoreSummary = $('#scoreSummary');
+    const wrongAnswersDiv = $('#wrongAnswers');
+    const backToMenu = $('#backToMenu');
+
+    // Answer mode radios + labels
+    const modeText = $('#answerModeText');
+    const modeMC = $('#answerModeMC');
+    const modeDraw = $('#answerModeDraw');
+    const modeTextLabel = $('#modeTextLabel');
+    const modeMCLabel = $('#modeMCLabel');
+    const modeDrawLabel = $('#modeDrawLabel');
+
+    // Distractor toggle
+    const distractorSelectedOnly = $('#distractorSelectedOnly');
+    const distractorLabel = $('#distractorLabel');
+
+    // ===== Build Question Pool =====
+    function buildBaseSet(poolCats){
+      return KANA.filter(k => poolCats.includes(k.cat));
+    }
+
+    function expandWithRepetitions(arr, reps){
+      const out = [];
+      for (let i=0;i<reps;i++) out.push(...arr.map(x=>({...x})));
+      return out;
+    }
+
+    function selectedQuizMeta(quizType) {
+      switch (quizType) {
+        case 'kataToRoma': return { from: 'katakana', to: 'romaji' };
+        case 'hiraToRoma': return { from: 'hiragana', to: 'romaji' };
+        case 'mixedToRoma': return { from: 'mixedKana', to: 'romaji' };
+        case 'hiraToKata': return { from: 'hiragana', to: 'katakana' };
+        case 'kataToHira': return { from: 'katakana', to: 'hiragana' };
+        case 'romaToHira': return { from: 'romaji',   to: 'hiragana' };
+        case 'romaToKata': return { from: 'romaji',   to: 'katakana' };
+        default:           return { from: 'katakana', to: 'romaji' };
+      }
+    }
+
+    function deriveKind(answerMode, to){
+      if (to === 'romaji') return 'text'; // typing only
+      if (answerMode === 'mc' || answerMode === 'draw') return answerMode;
+      return 'mc';
+    }
+
+    function createQuestions(quizType, poolCats, repetitions, answerMode){
+      const meta = selectedQuizMeta(quizType);
+      const base = buildBaseSet(poolCats);
+
+      const sourceExpanded = expandWithRepetitions(base, repetitions).map(item => {
+        let prompt;
+        if (meta.from === 'katakana') prompt = item.k;
+        else if (meta.from === 'hiragana') prompt = item.h;
+        else if (meta.from === 'mixedKana') prompt = (Math.random() < 0.5 ? item.k : item.h);
+        else /* romaji */ prompt = item.r;
+
+        let correct;
+        if (meta.to === 'romaji') correct = item.r;
+        else if (meta.to === 'hiragana') correct = item.h;
+        else if (meta.to === 'katakana') correct = item.k;
+
+        return { prompt, correct, item };
+      });
+
+      const kind = deriveKind(answerMode, meta.to);
+
+      const q = sourceExpanded.map(({prompt, correct, item}) => {
+        const hint =
+          kind === 'text' ? 'Type the romaji' :
+          (meta.to === 'hiragana' || meta.to === 'katakana')
+            ? (kind === 'mc' ? 'Pick the correct kana' : 'Draw the kana')
+            : '';
+
+        return {
+          kind,
+          prompt,
+          correct,
+          hint,
+          meta
+        };
+      });
+
+      return shuffle(q);
+    }
+
+    // ===== Answer mode availability =====
+    function updateAnswerModeAvailability(){
+      const quizType = ($$('input[name="quizType"]:checked')[0] || {}).value || 'kataToRoma';
+      const { to } = selectedQuizMeta(quizType);
+
+      const typingAllowed = (to === 'romaji');
+      // Typing
+      modeText.disabled = !typingAllowed;
+      modeTextLabel.classList.toggle('disabled', !typingAllowed);
+      if (!typingAllowed && modeText.checked) {
+        modeText.checked = false;
+        modeMC.checked = true;
+      }
+
+      // MC & Draw availability when to is kana
+      const kanaAnswer = (to === 'hiragana' || to === 'katakana');
+      modeMC.disabled = !kanaAnswer;
+      modeDraw.disabled = !kanaAnswer;
+      modeMCLabel.classList.toggle('disabled', !kanaAnswer);
+      modeDrawLabel.classList.toggle('disabled', !kanaAnswer);
+
+      // Distractor toggle is only relevant when kana + MC
+      const enableDistractor = kanaAnswer && modeMC.checked && !modeMC.disabled;
+      distractorSelectedOnly.disabled = !enableDistractor;
+      distractorLabel.classList.toggle('disabled', !enableDistractor);
+
+      if (!kanaAnswer) {
+        modeMC.checked = false;
+        modeDraw.checked = false;
+        if (!modeText.checked) modeText.checked = true;
+      }
+    }
+
+    // Re-evaluate when quizType or answerMode changes
+    $$('.grid input[name="quizType"]').forEach(r => {
+      r.addEventListener('change', updateAnswerModeAvailability);
+    });
+    $$('input[name="answerMode"]').forEach(r => {
+      r.addEventListener('change', updateAnswerModeAvailability);
+    });
+    // Initialize once
+    updateAnswerModeAvailability();
+
+    // ===== Quiz Flow =====
+    function startQuiz(){
+      const quizType = ($$('input[name="quizType"]:checked')[0] || {}).value || 'kataToRoma';
+      const poolCats = $$('.charPool:checked').map(x=>x.value);
+      const repetitions = Math.max(1, parseInt($('#repetitions').value || '1', 10));
+      const answerMode = ($$('input[name="answerMode"]:checked')[0] || {}).value || 'mc';
+
+      state.quizType = quizType;
+      state.poolCats = poolCats.length ? poolCats : ['vowels'];
+      state.repetitions = repetitions;
+      state.answerMode = answerMode;
+
+      state.questions = createQuestions(state.quizType, state.poolCats, state.repetitions, state.answerMode);
+      state.index = 0;
+      state.score = 0;
+      state.wrong = [];
+
+      mainMenu.classList.add('hidden');
+      scoreScreen.classList.add('hidden');
+      quizScreen.classList.remove('hidden');
+
+      renderQuestion();
+    }
+
+    function renderQuestion(){
+      const i = state.index;
+      const total = state.questions.length;
+      progressEl.textContent = `Question ${i+1} / ${total}`;
+      feedbackEl.textContent = '';
+      feedbackEl.className = '';
+
+      const q = state.questions[i];
+      promptBig.textContent = q.prompt;
+      promptHint.textContent = q.hint;
+
+      textAnswerWrap.classList.add('hidden');
+      mcWrap.classList.add('hidden');
+      drawWrap.classList.add('hidden');
+      revealArea.classList.add('hidden');
+
+      if(q.kind === 'text'){
+        textAnswerWrap.classList.remove('hidden');
+        textAnswer.value = '';
+        textAnswer.focus();
+      } else if(q.kind === 'mc'){
+        mcWrap.innerHTML = '';
+        mcWrap.classList.remove('hidden');
+
+        // Build MC options:
+        const targetIsKana = (q.meta.to === 'hiragana' || q.meta.to === 'katakana');
+
+        let pool = [];
+        if (targetIsKana) {
+          const useSelected = distractorSelectedOnly.checked;
+          if (useSelected) {
+            // Only selected pools, but include BOTH scripts from those pools
+            const base = buildBaseSet(state.poolCats);
+            pool = base.flatMap(x => [x.h, x.k]);
+          } else {
+            // All kana from both scripts
+            pool = KANA.flatMap(x => [x.h, x.k]);
+          }
+        } else {
+          // Not used (typing enforced), but safe default:
+          pool = KANA.map(x => x.r);
+        }
+
+        const correct = q.correct;
+        const distractors = sample(pool.filter(x => x !== correct), 3);
+        const options = shuffle([correct, ...distractors]);
+
+        options.forEach(opt => {
+          const btn = document.createElement('button');
+          btn.className = 'btn btn-secondary text-2xl py-4';
+          btn.textContent = opt;
+          btn.onclick = () => submitMC(opt === correct, opt, correct, q);
+          mcWrap.appendChild(btn);
+        });
+      } else if(q.kind === 'draw'){
+        drawWrap.classList.remove('hidden');
+        initCanvas();
+      }
+    }
+
+    function briefFeedback(ok){
+      feedbackEl.textContent = ok ? '✅' : '❌';
+      feedbackEl.className = ok ? 'text-2xl text-green-400' : 'text-2xl text-red-400';
+    }
+
+    function advance(){
+      state.index++;
+      if(state.index < state.questions.length){
+        renderQuestion();
+      } else {
+        showScore();
+      }
+    }
+
+    // ===== Text answers =====
+    textAnswer.addEventListener('keydown', (e)=>{
+      if(e.key === 'Enter'){
+        const q = state.questions[state.index];
+        const user = (textAnswer.value || '').trim().toLowerCase();
+        const correct = (q.correct || '').toLowerCase();
+        const ok = user === correct;
+        if(!ok){
+          state.wrong.push({ prompt: q.prompt, user, correct });
+        } else {
+          state.score++;
+        }
+        briefFeedback(ok);
+        setTimeout(advance, 600);
+      }
+    });
+
+    // ===== Multiple choice =====
+    function submitMC(ok, user, correct, q){
+      if(!ok){
+        state.wrong.push({ prompt: q.prompt, user, correct });
+      } else {
+        state.score++;
+      }
+      briefFeedback(ok);
+      setTimeout(advance, 600);
+    }
+
+    // ===== Drawing mode (self-mark) =====
+    let ctx, drawing = false, last = null;
+
+    function initCanvas(){
+      const ratio = window.devicePixelRatio || 1;
+      const style = getComputedStyle(drawCanvas);
+      const cssWidth = parseInt(style.width);
+      const cssHeight = parseInt(style.height);
+      drawCanvas.width = cssWidth * ratio;
+      drawCanvas.height = cssHeight * ratio;
+      ctx = drawCanvas.getContext('2d');
+      ctx.scale(ratio, ratio);
+      ctx.lineWidth = 6;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.strokeStyle = '#e5e7eb'; // light stroke on dark bg
+      clearCanvas();
+    }
+
+    function clearCanvas(){
+      const style = getComputedStyle(drawCanvas);
+      ctx.clearRect(0, 0, parseInt(style.width), parseInt(style.height));
+      ctx.fillStyle = '#111827'; // dark gray background for dark theme
+      ctx.fillRect(0, 0, parseInt(style.width), parseInt(style.height));
+    }
+
+    function getPos(e){
+      const rect = drawCanvas.getBoundingClientRect();
+      const isTouch = e.touches && e.touches[0];
+      const clientX = isTouch ? e.touches[0].clientX : e.clientX;
+      const clientY = isTouch ? e.touches[0].clientY : e.clientY;
+      return { x: clientX - rect.left, y: clientY - rect.top };
+    }
+
+    function startDraw(e){ drawing = true; last = getPos(e); }
+    function moveDraw(e){
+      if(!drawing) return;
+      const pos = getPos(e);
+      ctx.beginPath(); ctx.moveTo(last.x, last.y); ctx.lineTo(pos.x, pos.y); ctx.stroke();
+      last = pos;
+    }
+    function endDraw(){ drawing = false; last = null; }
+
+    drawCanvas.addEventListener('mousedown', startDraw);
+    drawCanvas.addEventListener('mousemove', moveDraw);
+    window.addEventListener('mouseup', endDraw);
+    drawCanvas.addEventListener('touchstart', (e)=>{ e.preventDefault(); startDraw(e); });
+    drawCanvas.addEventListener('touchmove', (e)=>{ e.preventDefault(); moveDraw(e); });
+    drawCanvas.addEventListener('touchend', (e)=>{ e.preventDefault(); endDraw(e); });
+
+    clearCanvasBtn.addEventListener('click', clearCanvas);
+
+    revealBtn.addEventListener('click', ()=>{
+      const q = state.questions[state.index];
+      correctGlyph.textContent = q.correct;
+      revealArea.classList.remove('hidden');
+    });
+
+    selfMarkRight.addEventListener('click', ()=>{
+      state.score++;
+      briefFeedback(true);
+      setTimeout(advance, 400);
+    });
+    selfMarkWrong.addEventListener('click', ()=>{
+      const q = state.questions[state.index];
+      state.wrong.push({ prompt: q.prompt, user: '[drawing]', correct: q.correct });
+      briefFeedback(false);
+      setTimeout(advance, 400);
+    });
+
+    // ===== Score Screen =====
+    function showScore(){
+      quizScreen.classList.add('hidden');
+      scoreScreen.classList.remove('hidden');
+      const total = state.questions.length;
+      scoreSummary.textContent = `${state.score} / ${total}`;
+
+      if(state.wrong.length === 0){
+        wrongAnswersDiv.innerHTML = `<p class="text-green-400">Perfect score! 🎉</p>`;
+      } else {
+        wrongAnswersDiv.innerHTML = `
+          <h3 class="font-semibold">Review</h3>
+          <div class="divide-y divide-gray-700">
+            ${state.wrong.map(w => `
+              <div class="py-2 flex items-center justify-between gap-3">
+                <span class="text-xl">${w.prompt}</span>
+                <span class="text-sm text-gray-400">Your answer: <span class="badge bg-gray-700 text-gray-100">${escapeHTML(String(w.user))}</span></span>
+                <span class="text-sm">Correct: <span class="badge bg-blue-900 text-blue-100">${w.correct}</span></span>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+    }
+
+    function escapeHTML(str){
+      return str.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
+    }
+
+    // ===== Events =====
+    startBtn.addEventListener('click', startQuiz);
+    backToMenu.addEventListener('click', ()=>{
+      scoreScreen.classList.add('hidden');
+      mainMenu.classList.remove('hidden');
+      revealArea.classList.add('hidden');
+    });
+  </script>
+</body>
+</html>
