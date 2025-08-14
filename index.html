@@ -211,7 +211,7 @@
         <div id="questionPrompt" class="text-center">
           <div id="promptBig" class="text-7xl font-bold mb-4 leading-none"></div>
           <div id="promptHint" class="text-gray-400 text-sm mb-4"></div>
-          <div id="feedback" class="text-3xl font-semibold mb-4"></div>
+          <div id="feedback" class="text-3xl font-semibold mb-4 transition-opacity duration-500"></div>
 
 
           <!-- Text input answer -->
@@ -673,7 +673,21 @@
 
     function briefFeedback(ok) {
       feedbackEl.textContent = ok ? '✅' : '❌';
-      feedbackEl.className = ok ? 'text-3xl font-semibold text-green-400' : 'text-3xl font-semibold text-red-400';
+      feedbackEl.className = ok
+        ? 'text-3xl font-semibold mb-4 text-green-400 transition-opacity duration-500'
+        : 'text-3xl font-semibold mb-4 text-red-400 transition-opacity duration-500';
+      feedbackEl.style.opacity = '1';
+
+      // After 400ms, start fading out
+      setTimeout(() => {
+        feedbackEl.style.opacity = '0';
+      }, 400);
+
+      // Reset so it's ready for the next question
+      setTimeout(() => {
+        feedbackEl.textContent = '';
+        feedbackEl.style.opacity = '1';
+      }, 800);
     }
 
     function advance() {
