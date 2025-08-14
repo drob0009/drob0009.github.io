@@ -415,11 +415,16 @@
       const kind = deriveKind(answerMode, meta.to);
 
       const q = sourceExpanded.map(({prompt, correct}) => {
-        const hint =
-          kind === 'text' ? 'Type the romaji' :
-          (meta.to === 'hiragana' || meta.to === 'katakana')
-            ? (kind === 'mc' ? 'Pick the correct kana' : 'Draw the kana')
-            : '';
+        let hint = '';
+        if (kind === 'text') {
+          hint = 'Type the romaji';
+        } else if (meta.to === 'hiragana' || meta.to === 'katakana' || meta.to === 'romaji') {
+          if (kind === 'mc') {
+            hint = `Pick the correct ${meta.to}`;
+          } else if (kind === 'draw') {
+            hint = `Draw the ${meta.to}`;
+          }
+        }
 
         return {
           kind,
