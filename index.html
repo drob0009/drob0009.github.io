@@ -212,7 +212,7 @@
           <div id="promptBig" class="text-7xl font-bold mb-4 leading-none">
           </div>
           <div id="promptHint" class="text-gray-400 text-sm mb-4"></div>
-          <div id="feedback" class="text-3xl font-semibold mb-4 min-h-10"></div>
+          <div id="feedback" class="text-3xl font-semibold mb-4 h-10"></div>
 
 
           <!-- Text input answer -->
@@ -430,6 +430,8 @@
     const distractorSelectedOnly = $('#distractorSelectedOnly');
     const distractorLabel = $('#distractorLabel');
 
+    const FEEDBACK_BASE = 'text-3xl font-semibold mb-4 h-10';
+
     // ===== Build Question Pool =====
     function buildBaseSet(poolCats) {
       return KANA.filter(k => poolCats.includes(k.cat));
@@ -624,7 +626,7 @@
       const total = state.questions.length;
       progressEl.textContent = `Question ${i + 1} / ${total}`;
       feedbackEl.textContent = '';
-      feedbackEl.className = '';
+      feedbackEl.className = FEEDBACK_BASE;
       //start hidden
       questionPromptEl.style.opacity = '0';
 
@@ -692,7 +694,7 @@
 
     function briefFeedback(ok) {
       feedbackEl.textContent = ok ? '✅' : '❌';
-      feedbackEl.className = ok
+      feedbackEl.className = FEEDBACK_BASE + ok
         ? 'text-3xl font-semibold mb-4 text-green-400'
         : 'text-3xl font-semibold mb-4 text-red-400';
     }
@@ -712,7 +714,7 @@
           // quick fade-in of the new screen
           fadeInQA();
         });
-      }, 400);
+      }, 200);
     }
 
     // Text answers
@@ -845,5 +847,3 @@
 </body>
 
 </html>
-
-
