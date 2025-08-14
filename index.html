@@ -614,7 +614,9 @@
       scoreScreen.classList.add('hidden');
       quizScreen.classList.remove('hidden');
 
+      questionPromptEl.style.opacity = '0';
       renderQuestion();
+      fadeInQA();
     }
 
     function renderQuestion() {
