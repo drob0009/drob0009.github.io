@@ -99,44 +99,44 @@
         <p class="text-sm text-gray-400 mb-3">Select one or more:</p>
         <div class="grid sm:grid-cols-3 gap-3">
           <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
-            <input type="checkbox" class="charPool w-4 h-4" value="vowels" />
+            <input type="checkbox" class="charPool w-4 h-4" value="vowels" checked />
             <span>Vowels (a, i, u, e, o)</span>
           </label>
 
           <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
-            <input type="checkbox" class="charPool w-4 h-4" value="k" />
+            <input type="checkbox" class="charPool w-4 h-4" value="k" checked />
             <span>K row (ka, ki, ku, ke, ko)</span>
           </label>
           <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
-            <input type="checkbox" class="charPool w-4 h-4" value="s" />
+            <input type="checkbox" class="charPool w-4 h-4" value="s" checked />
             <span>S row (sa, shi, su, se, so)</span>
           </label>
           <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
-            <input type="checkbox" class="charPool w-4 h-4" value="t" />
+            <input type="checkbox" class="charPool w-4 h-4" value="t" checked />
             <span>T row (ta, chi, tsu, te, to)</span>
           </label>
           <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
-            <input type="checkbox" class="charPool w-4 h-4" value="n" />
+            <input type="checkbox" class="charPool w-4 h-4" value="n" checked />
             <span>N row (na, ni, nu, ne, no)</span>
           </label>
           <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
-            <input type="checkbox" class="charPool w-4 h-4" value="h" />
+            <input type="checkbox" class="charPool w-4 h-4" value="h" checked />
             <span>H row (ha, hi, fu, he, ho)</span>
           </label>
           <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
-            <input type="checkbox" class="charPool w-4 h-4" value="m" />
+            <input type="checkbox" class="charPool w-4 h-4" value="m" checked />
             <span>M row (ma, mi, mu, me, mo)</span>
           </label>
           <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
-            <input type="checkbox" class="charPool w-4 h-4" value="y" />
+            <input type="checkbox" class="charPool w-4 h-4" value="y" checked />
             <span>Y row (ya, yu, yo)</span>
           </label>
           <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
-            <input type="checkbox" class="charPool w-4 h-4" value="r" />
+            <input type="checkbox" class="charPool w-4 h-4" value="r" checked />
             <span>R row (ra, ri, ru, re, ro)</span>
           </label>
           <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
-            <input type="checkbox" class="charPool w-4 h-4" value="w" />
+            <input type="checkbox" class="charPool w-4 h-4" value="w" checked />
             <span>W row (wa, wo)</span>
           </label>
 
@@ -144,6 +144,21 @@
             <input type="checkbox" class="charPool w-4 h-4" value="special" />
             <span>Special (n)</span>
           </label>
+        </div>
+
+        <!-- Presets -->
+        <div class="mt-5">
+          <h3 class="text-sm font-semibold mb-2 text-gray-300">Presets</h3>
+          <div class="flex flex-wrap gap-2">
+            <button type="button" class="btn btn-secondary text-sm px-3 py-1.5" data-preset="kst">K/S/T rows</button>
+            <button type="button" class="btn btn-secondary text-sm px-3 py-1.5" data-preset="vowelsY">Vowels + Y</button>
+            <button type="button" class="btn btn-secondary text-sm px-3 py-1.5" data-preset="starters">Starters (Vowels + K + S)</button>
+            <button type="button" class="btn btn-secondary text-sm px-3 py-1.5" data-preset="all">All Kana</button>
+            <button type="button" class="btn btn-secondary text-sm px-3 py-1.5" data-preset="clear">Clear all</button>
+          </div>
+          <p class="text-xs text-gray-500 mt-2">
+            Presets adjust the checkbox selection above. You can tweak further after applying.
+          </p>
         </div>
       </div>
 
@@ -298,7 +313,7 @@
     // ===== State =====
     const state = {
       quizType: 'kataToRoma',
-      poolCats: [],
+      poolCats: ['vowels','k','s','t','n','h','m','y','r','w'],
       repetitions: 1,
       answerMode: 'mc', // 'text' | 'mc' | 'draw'
       questions: [],
@@ -399,7 +414,7 @@
 
       const kind = deriveKind(answerMode, meta.to);
 
-      const q = sourceExpanded.map(({prompt, correct, item}) => {
+      const q = sourceExpanded.map(({prompt, correct}) => {
         const hint =
           kind === 'text' ? 'Type the romaji' :
           (meta.to === 'hiragana' || meta.to === 'katakana')
@@ -420,7 +435,7 @@
 
     // ===== Answer mode availability =====
     function updateAnswerModeAvailability(){
-      const quizType = ($$('input[name="quizType"]:checked')[0] || {}).value || 'kataToRoma';
+      const quizType = (document.querySelector('input[name="quizType"]:checked') || {}).value || 'kataToRoma';
       const { to } = selectedQuizMeta(quizType);
 
       const typingAllowed = (to === 'romaji');
@@ -439,7 +454,7 @@
       modeMCLabel.classList.toggle('disabled', !kanaAnswer);
       modeDrawLabel.classList.toggle('disabled', !kanaAnswer);
 
-      // Distractor toggle is only relevant when kana + MC
+      // Distractor toggle only relevant when kana + MC
       const enableDistractor = kanaAnswer && modeMC.checked && !modeMC.disabled;
       distractorSelectedOnly.disabled = !enableDistractor;
       distractorLabel.classList.toggle('disabled', !enableDistractor);
@@ -452,21 +467,48 @@
     }
 
     // Re-evaluate when quizType or answerMode changes
-    $$('.grid input[name="quizType"]').forEach(r => {
+    document.querySelectorAll('input[name="quizType"]').forEach(r => {
       r.addEventListener('change', updateAnswerModeAvailability);
     });
-    $$('input[name="answerMode"]').forEach(r => {
+    document.querySelectorAll('input[name="answerMode"]').forEach(r => {
       r.addEventListener('change', updateAnswerModeAvailability);
     });
     // Initialize once
     updateAnswerModeAvailability();
 
+    // ===== Character pool presets =====
+    function setPools(values){
+      const boxes = $$('.charPool');
+      const set = new Set(values);
+      boxes.forEach(b => { b.checked = set.has(b.value); });
+    }
+    function applyPreset(key){
+      const ALL = ['vowels','k','s','t','n','h','m','y','r','w','special'];
+      switch(key){
+        case 'kst':
+          setPools(['k','s','t']); break;
+        case 'vowelsY':
+          setPools(['vowels','y']); break;
+        case 'starters':
+          setPools(['vowels','k','s']); break;
+        case 'all':
+          setPools(ALL); break;
+        case 'clear':
+          setPools([]); break;
+      }
+    }
+    document.addEventListener('click', (e)=>{
+      const btn = e.target.closest('[data-preset]');
+      if(!btn) return;
+      applyPreset(btn.getAttribute('data-preset'));
+    });
+
     // ===== Quiz Flow =====
     function startQuiz(){
-      const quizType = ($$('input[name="quizType"]:checked')[0] || {}).value || 'kataToRoma';
+      const quizType = (document.querySelector('input[name="quizType"]:checked') || {}).value || 'kataToRoma';
       const poolCats = $$('.charPool:checked').map(x=>x.value);
       const repetitions = Math.max(1, parseInt($('#repetitions').value || '1', 10));
-      const answerMode = ($$('input[name="answerMode"]:checked')[0] || {}).value || 'mc';
+      const answerMode = (document.querySelector('input[name="answerMode"]:checked') || {}).value || 'mc';
 
       state.quizType = quizType;
       state.poolCats = poolCats.length ? poolCats : ['vowels'];
@@ -524,7 +566,7 @@
             pool = KANA.flatMap(x => [x.h, x.k]);
           }
         } else {
-          // Not used (typing enforced), but safe default:
+          // Not used with MC (typing enforced), but safe default:
           pool = KANA.map(x => x.r);
         }
 
