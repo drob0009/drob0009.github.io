@@ -626,7 +626,7 @@
 
         options.forEach(opt => {
           const btn = document.createElement('button');
-          btn.className = 'btn btn-secondary text-2xl py-4';
+          btn.className = 'w-full border border-gray-600 rounded-xl py-4 text-2xl bg-gray-800 hover:bg-gray-700 active:bg-gray-600 transition';
           btn.textContent = opt;
           btn.onclick = () => submitMC(opt === correct, opt, correct, q);
           mcWrap.appendChild(btn);
@@ -781,3 +781,4 @@
 </body>
 
 </html>
+
