@@ -6,7 +6,7 @@
   <title>Kana Quiz</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    /* Simple canvas styling */
+    /* Basic utilities */
     #drawCanvas { touch-action: none; }
     .btn { @apply px-4 py-2 rounded font-medium transition; }
     .btn-primary { @apply bg-blue-500 text-white hover:bg-blue-600; }
@@ -14,6 +14,12 @@
     .btn-danger { @apply bg-red-600 text-white hover:bg-red-700; }
     .badge { @apply rounded px-2 py-0.5 text-xs font-semibold; }
     .disabled { @apply opacity-50 pointer-events-none; }
+
+    /* Nice checkbox/radio rows */
+    .choice {
+      @apply flex items-center gap-3 border border-gray-700 rounded-xl p-3 cursor-pointer;
+    }
+    .choice input { @apply w-4 h-4; }
   </style>
 </head>
 <body class="bg-gray-900 text-gray-100 min-h-screen">
@@ -29,32 +35,32 @@
       <div class="bg-gray-800 shadow-sm rounded-2xl p-5">
         <h2 class="text-xl font-semibold mb-4">Quiz Type</h2>
         <div class="grid gap-3 sm:grid-cols-2">
-          <label class="flex items-center gap-3 border border-gray-700 rounded-xl p-3 cursor-pointer">
-            <input type="radio" name="quizType" value="kataToRoma" class="w-4 h-4" checked>
+          <label class="choice">
+            <input type="radio" name="quizType" value="kataToRoma" checked>
             <span>Katakana ➜ Romaji</span>
           </label>
-          <label class="flex items-center gap-3 border border-gray-700 rounded-xl p-3 cursor-pointer">
-            <input type="radio" name="quizType" value="hiraToRoma" class="w-4 h-4">
+          <label class="choice">
+            <input type="radio" name="quizType" value="hiraToRoma">
             <span>Hiragana ➜ Romaji</span>
           </label>
-          <label class="flex items-center gap-3 border border-gray-700 rounded-xl p-3 cursor-pointer">
-            <input type="radio" name="quizType" value="mixedToRoma" class="w-4 h-4">
+          <label class="choice">
+            <input type="radio" name="quizType" value="mixedToRoma">
             <span>Mixed Kana (ひ/カ) ➜ Romaji</span>
           </label>
-          <label class="flex items-center gap-3 border border-gray-700 rounded-xl p-3 cursor-pointer">
-            <input type="radio" name="quizType" value="hiraToKata" class="w-4 h-4">
+          <label class="choice">
+            <input type="radio" name="quizType" value="hiraToKata">
             <span>Hiragana ➜ Katakana</span>
           </label>
-          <label class="flex items-center gap-3 border border-gray-700 rounded-xl p-3 cursor-pointer">
-            <input type="radio" name="quizType" value="kataToHira" class="w-4 h-4">
+          <label class="choice">
+            <input type="radio" name="quizType" value="kataToHira">
             <span>Katakana ➜ Hiragana</span>
           </label>
-          <label class="flex items-center gap-3 border border-gray-700 rounded-xl p-3 cursor-pointer">
-            <input type="radio" name="quizType" value="romaToHira" class="w-4 h-4">
+          <label class="choice">
+            <input type="radio" name="quizType" value="romaToHira">
             <span>Romaji ➜ Hiragana</span>
           </label>
-          <label class="flex items-center gap-3 border border-gray-700 rounded-xl p-3 cursor-pointer">
-            <input type="radio" name="quizType" value="romaToKata" class="w-4 h-4">
+          <label class="choice">
+            <input type="radio" name="quizType" value="romaToKata">
             <span>Romaji ➜ Katakana</span>
           </label>
         </div>
@@ -64,31 +70,31 @@
       <div class="bg-gray-800 shadow-sm rounded-2xl p-5">
         <h2 class="text-xl font-semibold mb-3">Answer Mode</h2>
         <p class="text-sm text-gray-400 mb-3" id="answerModeHint">
-          Typing is only allowed when the answer is Romaji. For Kana answers, use Multiple Choice or Drawing.
+          Romaji answers: Typing or Multiple Choice. Kana answers: Multiple Choice or Drawing.
         </p>
         <div class="grid sm:grid-cols-3 gap-3" id="answerModeGroup">
-          <label id="modeTextLabel" class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
-            <input type="radio" name="answerMode" value="text" id="answerModeText" class="w-4 h-4">
+          <label id="modeTextLabel" class="choice">
+            <input type="radio" name="answerMode" value="text" id="answerModeText">
             <span>Typing</span>
           </label>
-          <label id="modeMCLabel" class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
-            <input type="radio" name="answerMode" value="mc" id="answerModeMC" class="w-4 h-4" checked>
+          <label id="modeMCLabel" class="choice">
+            <input type="radio" name="answerMode" value="mc" id="answerModeMC" checked>
             <span>Multiple Choice</span>
           </label>
-          <label id="modeDrawLabel" class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
-            <input type="radio" name="answerMode" value="draw" id="answerModeDraw" class="w-4 h-4">
+          <label id="modeDrawLabel" class="choice">
+            <input type="radio" name="answerMode" value="draw" id="answerModeDraw">
             <span>Drawing</span>
           </label>
         </div>
 
         <!-- Distractor pool toggle (for Kana MC only) -->
         <div id="distractorRow" class="mt-4">
-          <label id="distractorLabel" class="flex items-center gap-2 border border-gray-700 rounded-xl p-3">
-            <input type="checkbox" id="distractorSelectedOnly" class="w-4 h-4" />
-            <span>Only use selected character pools for distractors (still both scripts)</span>
+          <label id="distractorLabel" class="choice">
+            <input type="checkbox" id="distractorSelectedOnly" />
+            <span>Only use selected character pools for kana distractors (still both scripts)</span>
           </label>
           <p class="text-xs text-gray-500 mt-2">
-            When unchecked (default), distractors come from all kana (hiragana + katakana).
+            When unchecked (default), kana distractors come from all kana (hiragana + katakana).
           </p>
         </div>
       </div>
@@ -98,50 +104,50 @@
         <h2 class="text-xl font-semibold mb-3">Character Pools</h2>
         <p class="text-sm text-gray-400 mb-3">Select one or more:</p>
         <div class="grid sm:grid-cols-3 gap-3">
-          <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
-            <input type="checkbox" class="charPool w-4 h-4" value="vowels" checked />
+          <label class="choice">
+            <input type="checkbox" class="charPool" value="vowels" checked />
             <span>Vowels (a, i, u, e, o)</span>
           </label>
 
-          <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
-            <input type="checkbox" class="charPool w-4 h-4" value="k" checked />
+          <label class="choice">
+            <input type="checkbox" class="charPool" value="k" checked />
             <span>K row (ka, ki, ku, ke, ko)</span>
           </label>
-          <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
-            <input type="checkbox" class="charPool w-4 h-4" value="s" checked />
+          <label class="choice">
+            <input type="checkbox" class="charPool" value="s" checked />
             <span>S row (sa, shi, su, se, so)</span>
           </label>
-          <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
-            <input type="checkbox" class="charPool w-4 h-4" value="t" checked />
+          <label class="choice">
+            <input type="checkbox" class="charPool" value="t" checked />
             <span>T row (ta, chi, tsu, te, to)</span>
           </label>
-          <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
-            <input type="checkbox" class="charPool w-4 h-4" value="n" checked />
+          <label class="choice">
+            <input type="checkbox" class="charPool" value="n" checked />
             <span>N row (na, ni, nu, ne, no)</span>
           </label>
-          <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
-            <input type="checkbox" class="charPool w-4 h-4" value="h" checked />
+          <label class="choice">
+            <input type="checkbox" class="charPool" value="h" checked />
             <span>H row (ha, hi, fu, he, ho)</span>
           </label>
-          <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
-            <input type="checkbox" class="charPool w-4 h-4" value="m" checked />
+          <label class="choice">
+            <input type="checkbox" class="charPool" value="m" checked />
             <span>M row (ma, mi, mu, me, mo)</span>
           </label>
-          <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
-            <input type="checkbox" class="charPool w-4 h-4" value="y" checked />
+          <label class="choice">
+            <input type="checkbox" class="charPool" value="y" checked />
             <span>Y row (ya, yu, yo)</span>
           </label>
-          <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
-            <input type="checkbox" class="charPool w-4 h-4" value="r" checked />
+          <label class="choice">
+            <input type="checkbox" class="charPool" value="r" checked />
             <span>R row (ra, ri, ru, re, ro)</span>
           </label>
-          <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
-            <input type="checkbox" class="charPool w-4 h-4" value="w" checked />
+          <label class="choice">
+            <input type="checkbox" class="charPool" value="w" checked />
             <span>W row (wa, wo)</span>
           </label>
 
-          <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
-            <input type="checkbox" class="charPool w-4 h-4" value="special" />
+          <label class="choice">
+            <input type="checkbox" class="charPool" value="special" />
             <span>Special (n)</span>
           </label>
         </div>
@@ -187,15 +193,15 @@
           <div id="promptBig" class="text-7xl font-bold mb-4 leading-none"></div>
           <div id="promptHint" class="text-gray-400 text-sm mb-4"></div>
 
-          <!-- Text input answer -->
+          <!-- Typing -->
           <div id="textAnswerWrap" class="mb-4 hidden">
             <input id="textAnswer" type="text" class="w-full text-center text-xl p-3 border border-gray-700 rounded bg-gray-900 text-gray-100" placeholder="Type answer and press Enter" />
           </div>
 
-          <!-- Multiple choice answer -->
+          <!-- Multiple Choice -->
           <div id="mcWrap" class="grid grid-cols-2 gap-3 hidden"></div>
 
-          <!-- Drawing answer -->
+          <!-- Drawing -->
           <div id="drawWrap" class="hidden">
             <canvas id="drawCanvas" class="border border-gray-700 rounded-xl w-full max-w-md h-64 mx-auto bg-gray-900"></canvas>
             <div class="flex justify-center gap-2 mt-3">
@@ -319,7 +325,7 @@
       questions: [],
       index: 0,
       score: 0,
-      wrong: [] // {prompt, user, correct, note}
+      wrong: [] // {prompt, user, correct}
     };
 
     // ===== UI Refs =====
@@ -374,6 +380,7 @@
       return out;
     }
 
+    // Quiz meta derived from quizType
     function selectedQuizMeta(quizType) {
       switch (quizType) {
         case 'kataToRoma': return { from: 'katakana', to: 'romaji' };
@@ -387,12 +394,15 @@
       }
     }
 
+    // Determine question kind from answerMode + target
     function deriveKind(answerMode, to){
-      if (to === 'romaji') return 'text'; // typing only
-      if (answerMode === 'mc' || answerMode === 'draw') return answerMode;
-      return 'mc';
+      // Romaji: allow text or MC (no drawing)
+      if (to === 'romaji') return (answerMode === 'mc' ? 'mc' : 'text');
+      // Kana: MC or Drawing
+      return (answerMode === 'draw' ? 'draw' : 'mc');
     }
 
+    // Create questions list
     function createQuestions(quizType, poolCats, repetitions, answerMode){
       const meta = selectedQuizMeta(quizType);
       const base = buildBaseSet(poolCats);
@@ -409,30 +419,23 @@
         else if (meta.to === 'hiragana') correct = item.h;
         else if (meta.to === 'katakana') correct = item.k;
 
-        return { prompt, correct, item };
+        return { prompt, correct };
       });
 
       const kind = deriveKind(answerMode, meta.to);
 
       const q = sourceExpanded.map(({prompt, correct}) => {
+        // Explicit hints by script
         let hint = '';
         if (kind === 'text') {
           hint = 'Type the romaji';
-        } else if (meta.to === 'hiragana' || meta.to === 'katakana' || meta.to === 'romaji') {
-          if (kind === 'mc') {
-            hint = `Pick the correct ${meta.to}`;
-          } else if (kind === 'draw') {
-            hint = `Draw the ${meta.to}`;
-          }
+        } else if (kind === 'mc') {
+          hint = `Pick the correct ${meta.to}`;
+        } else if (kind === 'draw') {
+          hint = `Draw the ${meta.to}`;
         }
 
-        return {
-          kind,
-          prompt,
-          correct,
-          hint,
-          meta
-        };
+        return { kind, prompt, correct, hint, meta };
       });
 
       return shuffle(q);
@@ -443,35 +446,42 @@
       const quizType = (document.querySelector('input[name="quizType"]:checked') || {}).value || 'kataToRoma';
       const { to } = selectedQuizMeta(quizType);
 
-      const typingAllowed = (to === 'romaji');
+      const typingAllowed = (to === 'romaji'); // text allowed for romaji
+      const mcAllowed = (to === 'romaji' || to === 'hiragana' || to === 'katakana');
+      const drawAllowed = (to === 'hiragana' || to === 'katakana');
+
       // Typing
       modeText.disabled = !typingAllowed;
       modeTextLabel.classList.toggle('disabled', !typingAllowed);
-      if (!typingAllowed && modeText.checked) {
-        modeText.checked = false;
-        modeMC.checked = true;
+      if (!typingAllowed && modeText.checked) modeText.checked = false;
+
+      // Multiple Choice & Drawing
+      modeMC.disabled = !mcAllowed;
+      modeDraw.disabled = !drawAllowed;
+      modeMCLabel.classList.toggle('disabled', !mcAllowed);
+      modeDrawLabel.classList.toggle('disabled', !drawAllowed);
+
+      // Ensure at least one valid mode remains selected
+      if (!modeMC.checked && !modeText.checked && !modeDraw.checked) {
+        if (mcAllowed) modeMC.checked = true;
+        else if (typingAllowed) modeText.checked = true;
       }
 
-      // MC & Draw availability when to is kana
+      // Distractor toggle only relevant when KANA + MC
       const kanaAnswer = (to === 'hiragana' || to === 'katakana');
-      modeMC.disabled = !kanaAnswer;
-      modeDraw.disabled = !kanaAnswer;
-      modeMCLabel.classList.toggle('disabled', !kanaAnswer);
-      modeDrawLabel.classList.toggle('disabled', !kanaAnswer);
-
-      // Distractor toggle only relevant when kana + MC
-      const enableDistractor = kanaAnswer && modeMC.checked && !modeMC.disabled;
+      const enableDistractor = kanaAnswer && mcAllowed && modeMC.checked && !modeMC.disabled;
       distractorSelectedOnly.disabled = !enableDistractor;
       distractorLabel.classList.toggle('disabled', !enableDistractor);
 
       if (!kanaAnswer) {
-        modeMC.checked = false;
-        modeDraw.checked = false;
-        if (!modeText.checked) modeText.checked = true;
+        // For romaji answers, drawing is never allowed
+        if (modeDraw.checked) modeDraw.checked = false;
+        // Prefer MC for romaji if available; else typing
+        if (!modeMC.checked && typingAllowed) modeText.checked = true;
       }
     }
 
-    // Re-evaluate when quizType or answerMode changes
+    // Wire mode availability updates
     document.querySelectorAll('input[name="quizType"]').forEach(r => {
       r.addEventListener('change', updateAnswerModeAvailability);
     });
@@ -509,6 +519,13 @@
     });
 
     // ===== Quiz Flow =====
+    startBtn.addEventListener('click', startQuiz);
+    backToMenu.addEventListener('click', ()=>{
+      scoreScreen.classList.add('hidden');
+      mainMenu.classList.remove('hidden');
+      revealArea.classList.add('hidden');
+    });
+
     function startQuiz(){
       const quizType = (document.querySelector('input[name="quizType"]:checked') || {}).value || 'kataToRoma';
       const poolCats = $$('.charPool:checked').map(x=>x.value);
@@ -558,8 +575,8 @@
 
         // Build MC options:
         const targetIsKana = (q.meta.to === 'hiragana' || q.meta.to === 'katakana');
-
         let pool = [];
+
         if (targetIsKana) {
           const useSelected = distractorSelectedOnly.checked;
           if (useSelected) {
@@ -570,9 +587,10 @@
             // All kana from both scripts
             pool = KANA.flatMap(x => [x.h, x.k]);
           }
-        } else {
-          // Not used with MC (typing enforced), but safe default:
-          pool = KANA.map(x => x.r);
+        } else if (q.meta.to === 'romaji') {
+          // For romaji MC, use romaji from SELECTED pools (focused practice)
+          const base = buildBaseSet(state.poolCats);
+          pool = base.map(x => x.r);
         }
 
         const correct = q.correct;
@@ -656,7 +674,7 @@
     function clearCanvas(){
       const style = getComputedStyle(drawCanvas);
       ctx.clearRect(0, 0, parseInt(style.width), parseInt(style.height));
-      ctx.fillStyle = '#111827'; // dark gray background for dark theme
+      ctx.fillStyle = '#111827'; // dark gray
       ctx.fillRect(0, 0, parseInt(style.width), parseInt(style.height));
     }
 
@@ -732,14 +750,6 @@
     function escapeHTML(str){
       return str.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
     }
-
-    // ===== Events =====
-    startBtn.addEventListener('click', startQuiz);
-    backToMenu.addEventListener('click', ()=>{
-      scoreScreen.classList.add('hidden');
-      mainMenu.classList.remove('hidden');
-      revealArea.classList.add('hidden');
-    });
   </script>
 </body>
 </html>
