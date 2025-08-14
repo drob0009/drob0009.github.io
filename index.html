@@ -699,18 +699,20 @@
 
     function finishQuestionAndAdvance() {
       detachMCShortcuts();
-      fadeOutQA(() => {
-        // clear feedback text before next render
-        feedbackEl.textContent = '';
-        state.index++;
-        if (state.index >= state.questions.length) {
-          showScore();
-          return;
-        }
-        renderQuestion();
-        // quick fade-in of the new screen
-        fadeInQA();
-      });
+      setTimeout(() => {
+        fadeOutQA(() => {
+          // clear feedback text before next render
+          feedbackEl.textContent = '';
+          state.index++;
+          if (state.index >= state.questions.length) {
+            showScore();
+            return;
+          }
+          renderQuestion();
+          // quick fade-in of the new screen
+          fadeInQA();
+        });
+      }, 400);
     }
 
     // Text answers
