@@ -15,14 +15,14 @@
       <p class="text-sm text-gray-400">Hiragana • Katakana • Romaji</p>
     </header>
 
-    <!-- Main Menu / Options -->
+    <!-- Main Menu -->
     <section id="mainMenu" class="space-y-6">
       <!-- Quiz Type -->
       <div class="bg-gray-800 shadow-sm rounded-2xl p-5">
-        <h2 class="text-xl font-semibold mb-4">Quiz Type</h2>
-        <div class="grid gap-3 sm:grid-cols-2">
+        <h2 class="text-xl font-semibold mb-3">Quiz Type</h2>
+        <div class="grid sm:grid-cols-2 gap-3">
           <label class="flex items-center gap-3 border border-gray-700 rounded-xl p-3 cursor-pointer">
-            <input type="radio" name="quizType" value="kataToRoma" class="w-4 h-4" checked>
+            <input type="radio" name="quizType" value="kataToRoma" class="w-4 h-4">
             <span>Katakana ➜ Romaji</span>
           </label>
           <label class="flex items-center gap-3 border border-gray-700 rounded-xl p-3 cursor-pointer">
@@ -50,40 +50,38 @@
             <span>Romaji ➜ Katakana</span>
           </label>
         </div>
-      </div>
 
-      <!-- Answer Mode -->
-      <div class="bg-gray-800 shadow-sm rounded-2xl p-5">
-        <h2 class="text-xl font-semibold mb-3">Answer Mode</h2>
-        <p class="text-sm text-gray-400 mb-3" id="answerModeHint">
-          Romaji answers: Typing or Multiple Choice. Kana answers: Multiple Choice or Drawing.
-        </p>
-        <div class="grid sm:grid-cols-3 gap-3" id="answerModeGroup">
-          <label id="modeTextLabel"
-            class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
-            <input type="radio" name="answerMode" value="text" id="answerModeText" class="w-4 h-4">
-            <span>Typing</span>
-          </label>
-          <label id="modeMCLabel" class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
-            <input type="radio" name="answerMode" value="mc" id="answerModeMC" class="w-4 h-4" checked>
-            <span>Multiple Choice</span>
-          </label>
-          <label id="modeDrawLabel"
-            class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
-            <input type="radio" name="answerMode" value="draw" id="answerModeDraw" class="w-4 h-4">
-            <span>Drawing</span>
-          </label>
-        </div>
+        <!-- Answer Mode -->
+        <div class="mt-4">
+          <h2 class="text-xl font-semibold mb-2">Answer Mode</h2>
+          <div class="grid sm:grid-cols-3 gap-3">
+            <label id="modeTextLabel"
+              class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
+              <input type="radio" name="answerMode" value="text" id="answerModeText" class="w-4 h-4">
+              <span>Typing</span>
+            </label>
+            <label id="modeMCLabel"
+              class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
+              <input type="radio" name="answerMode" value="mc" id="answerModeMC" class="w-4 h-4" checked>
+              <span>Multiple Choice</span>
+            </label>
+            <label id="modeDrawLabel"
+              class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
+              <input type="radio" name="answerMode" value="draw" id="answerModeDraw" class="w-4 h-4">
+              <span>Drawing</span>
+            </label>
+          </div>
 
-        <!-- Distractor pool toggle (for Kana MC only) -->
-        <div id="distractorRow" class="mt-4">
-          <label id="distractorLabel" class="flex items-center gap-2 border border-gray-700 rounded-xl p-3">
-            <input type="checkbox" id="distractorSelectedOnly" class="w-4 h-4" />
-            <span>Only use selected character pools for kana distractors (still both scripts)</span>
-          </label>
-          <p class="text-xs text-gray-500 mt-2">
-            When unchecked (default), kana distractors come from all kana (hiragana + katakana).
-          </p>
+          <!-- Distractor pool toggle (for Kana MC only) -->
+          <div id="distractorRow" class="mt-4">
+            <label id="distractorLabel" class="flex items-center gap-2 border border-gray-700 rounded-xl p-3">
+              <input type="checkbox" id="distractorSelectedOnly" class="w-4 h-4" />
+              <span>Only use selected character pools for kana distractors (still both scripts)</span>
+            </label>
+            <p class="text-xs text-gray-500 mt-2">
+              When unchecked (default), kana distractors come from all kana (hiragana + katakana).
+            </p>
+          </div>
         </div>
       </div>
 
@@ -92,11 +90,11 @@
         <h2 class="text-xl font-semibold mb-3">Character Pools</h2>
         <p class="text-sm text-gray-400 mb-3">Select one or more:</p>
         <div class="grid sm:grid-cols-3 gap-3">
+          <!-- Basic gojūon -->
           <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
             <input type="checkbox" class="charPool w-4 h-4" value="vowels" checked />
             <span>Vowels (a, i, u, e, o)</span>
           </label>
-
           <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
             <input type="checkbox" class="charPool w-4 h-4" value="k" checked />
             <span>K row (ka, ki, ku, ke, ko)</span>
@@ -133,10 +131,37 @@
             <input type="checkbox" class="charPool w-4 h-4" value="w" checked />
             <span>W row (wa, wo)</span>
           </label>
-
           <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
-            <input type="checkbox" class="charPool w-4 h-4" value="special" />
+            <input type="checkbox" class="charPool w-4 h-4" value="special" checked />
             <span>Special (n)</span>
+          </label>
+
+          <!-- Dakuten / handakuten -->
+          <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
+            <input type="checkbox" class="charPool w-4 h-4" value="g" checked />
+            <span>G row (ga, gi, gu, ge, go)</span>
+          </label>
+          <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
+            <input type="checkbox" class="charPool w-4 h-4" value="z" checked />
+            <span>Z row (za, ji, zu, ze, zo)</span>
+          </label>
+          <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
+            <input type="checkbox" class="charPool w-4 h-4" value="d" checked />
+            <span>D row (da, ji, zu, de, do)</span>
+          </label>
+          <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
+            <input type="checkbox" class="charPool w-4 h-4" value="b" checked />
+            <span>B row (ba, bi, bu, be, bo)</span>
+          </label>
+          <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
+            <input type="checkbox" class="charPool w-4 h-4" value="p" checked />
+            <span>P row (pa, pi, pu, pe, po)</span>
+          </label>
+
+          <!-- Yōon (aggregate) -->
+          <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer sm:col-span-3">
+            <input type="checkbox" class="charPool w-4 h-4" value="yoon" checked />
+            <span>Yōon (kya, sha, cha, nya, etc.)</span>
           </label>
         </div>
 
@@ -177,43 +202,45 @@
     <!-- Quiz Screen -->
     <section id="quizScreen" class="hidden">
       <div class="bg-gray-800 shadow-sm rounded-2xl p-5">
-        <div class="flex items-center justify-between mb-4">
-          <div id="progress" class="text-sm text-gray-400"></div>
+        <div class="flex items-center justify-between">
+          <button class="btn btn-ghost js-back-menu">Back to Menu</button>
+          <div class="text-sm text-gray-400">Score: <span id="scoreNow">0</span></div>
         </div>
-        <div id="questionPrompt" class="text-center transition-opacity duration-500">
-          <div id="promptBig" class="text-7xl font-bold mb-4 leading-none">
+
+        <div class="mt-4">
+          <div id="promptHint" class="text-xs text-gray-500 mb-2"></div>
+          <div id="questionPrompt" class="text-3xl font-semibold mb-4">—</div>
+          <div id="feedback" aria-live="polite" class="h-6 text-2xl"></div>
+
+          <!-- Typing -->
+          <div id="textAnswerWrap" class="mb-4 hidden transition-opacity duration-500">
+            <input id="textAnswer" type="text" placeholder="Type your answer and press Enter"
+              class="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 focus:outline-none">
+            <p class="text-xs text-gray-500">For Romaji: type either IME <code>kbd</code> (e.g., <code>si</code>) or
+              phonetic <code>phon</code> (e.g., <code>shi</code>).</p>
           </div>
-          <div id="promptHint" class="text-gray-400 text-sm mb-4"></div>
-          <div id="feedback" class="text-3xl font-semibold mb-4 h-10"></div>
 
+          <!-- Multiple choice -->
+          <div id="mcWrap" class="grid sm:grid-cols-2 gap-2 mb-4 hidden transition-opacity duration-500"></div>
 
-          <!-- Text input answer -->
-          <div id="textAnswerWrap" class="mb-4 hidden">
-            <input id="textAnswer" type="text"
-              class="w-full text-center text-xl p-3 border border-gray-700 rounded bg-gray-900 text-gray-100"
-              placeholder="Type answer and press Enter" />
-          </div>
-
-          <!-- Multiple choice answer -->
-          <div id="mcWrap" class="grid grid-cols-2 gap-3 hidden"></div>
-
-          <!-- Drawing answer -->
-          <div id="drawWrap" class="hidden">
-            <canvas id="drawCanvas"
-              class="border border-gray-700 rounded-xl w-full max-w-md h-64 mx-auto bg-gray-900"></canvas>
-            <div class="flex justify-center gap-2 mt-3">
+          <!-- Drawing -->
+          <div id="drawWrap" class="hidden mb-4 transition-opacity duration-500">
+            <canvas id="drawCanvas" class="w-full bg-gray-900 rounded border border-gray-700" height="220"></canvas>
+            <div class="flex gap-2">
               <button id="clearCanvas" class="btn btn-secondary">Clear</button>
-              <button id="revealCorrect" class="btn btn-secondary">Reveal Correct</button>
+              <button id="revealCorrect" class="btn btn-secondary">Reveal Answer</button>
             </div>
-            <div id="revealArea" class="mt-4 hidden text-center">
-              <p class="text-sm text-gray-400 mb-1">Correct character:</p>
-              <div id="correctGlyph" class="text-7xl font-bold"></div>
-              <div class="flex justify-center gap-2 mt-3">
-                <button id="selfMarkRight" class="btn btn-primary">I was right</button>
-                <button id="selfMarkWrong" class="btn btn-danger">I was wrong</button>
-              </div>
+            <div id="revealArea" class="hidden text-2xl"><span id="correctGlyph"></span></div>
+            <div class="flex gap-2">
+              <button id="selfMarkRight" class="btn btn-primary">I got it</button>
+              <button id="selfMarkWrong" class="btn btn-secondary">I missed</button>
             </div>
           </div>
+        </div>
+
+        <div class="flex items-center justify-between mt-3">
+          <div class="text-sm text-gray-400">Question <span id="qIndex">0</span>/<span id="qTotal">0</span></div>
+          <button id="nextQ" class="btn btn-ghost">Next</button>
         </div>
       </div>
     </section>
@@ -230,18 +257,19 @@
       </div>
     </section>
   </div>
+
+  <!-- Reference Screen -->
   <section id="referenceScreen" class="hidden">
     <div class="bg-gray-800 shadow-sm rounded-2xl p-5">
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-2xl font-bold">Kana Chart</h2>
         <button class="btn btn-ghost js-back-menu">Back to Menu</button>
       </div>
-
       <p class="text-sm text-gray-400 mb-3">
-        Basic gojūon (no dakuten/handakuten). Each cell shows <span class="font-semibold">hiragana</span> / <span
-          class="font-semibold">katakana</span> with romaji.
+        Gojūon including dakuten (゛), handakuten (゜) and yōon (ゃ/ゅ/ょ). Each vowel column shows <span
+          class="font-semibold">Kana</span>, <span class="font-semibold">kbd</span> (IME entry), and <span
+          class="font-semibold">phon</span> (pronunciation).
       </p>
-
       <div id="kanaTable" class="overflow-x-auto"></div>
 
       <div class="mt-4">
@@ -250,7 +278,6 @@
           <span class="text-xl">ん</span>
           <span class="text-xl">/</span>
           <span class="text-xl">ン</span>
-          <span class="text-sm text-gray-400">(n)</span>
         </div>
       </div>
     </div>
@@ -260,76 +287,186 @@
     // ===== Data =====
     const KANA = [
       // Vowels
-      { r: 'a', h: 'あ', k: 'ア', cat: 'vowels' },
-      { r: 'i', h: 'い', k: 'イ', cat: 'vowels' },
-      { r: 'u', h: 'う', k: 'ウ', cat: 'vowels' },
-      { r: 'e', h: 'え', k: 'エ', cat: 'vowels' },
-      { r: 'o', h: 'お', k: 'オ', cat: 'vowels' },
-      // K row
-      { r: 'ka', h: 'か', k: 'カ', cat: 'k' },
-      { r: 'ki', h: 'き', k: 'キ', cat: 'k' },
-      { r: 'ku', h: 'く', k: 'ク', cat: 'k' },
-      { r: 'ke', h: 'け', k: 'ケ', cat: 'k' },
-      { r: 'ko', h: 'こ', k: 'コ', cat: 'k' },
-      // S row
-      { r: 'sa', h: 'さ', k: 'サ', cat: 's' },
-      { r: 'shi', h: 'し', k: 'シ', cat: 's' },
-      { r: 'su', h: 'す', k: 'ス', cat: 's' },
-      { r: 'se', h: 'せ', k: 'セ', cat: 's' },
-      { r: 'so', h: 'そ', k: 'ソ', cat: 's' },
-      // T row
-      { r: 'ta', h: 'た', k: 'タ', cat: 't' },
-      { r: 'chi', h: 'ち', k: 'チ', cat: 't' },
-      { r: 'tsu', h: 'つ', k: 'ツ', cat: 't' },
-      { r: 'te', h: 'て', k: 'テ', cat: 't' },
-      { r: 'to', h: 'と', k: 'ト', cat: 't' },
-      // N row
-      { r: 'na', h: 'な', k: 'ナ', cat: 'n' },
-      { r: 'ni', h: 'に', k: 'ニ', cat: 'n' },
-      { r: 'nu', h: 'ぬ', k: 'ヌ', cat: 'n' },
-      { r: 'ne', h: 'ね', k: 'ネ', cat: 'n' },
-      { r: 'no', h: 'の', k: 'ノ', cat: 'n' },
-      // H row
-      { r: 'ha', h: 'は', k: 'ハ', cat: 'h' },
-      { r: 'hi', h: 'ひ', k: 'ヒ', cat: 'h' },
-      { r: 'fu', h: 'ふ', k: 'フ', cat: 'h' },
-      { r: 'he', h: 'へ', k: 'ヘ', cat: 'h' },
-      { r: 'ho', h: 'ほ', k: 'ホ', cat: 'h' },
-      // M row
-      { r: 'ma', h: 'ま', k: 'マ', cat: 'm' },
-      { r: 'mi', h: 'み', k: 'ミ', cat: 'm' },
-      { r: 'mu', h: 'む', k: 'ム', cat: 'm' },
-      { r: 'me', h: 'め', k: 'メ', cat: 'm' },
-      { r: 'mo', h: 'も', k: 'モ', cat: 'm' },
-      // Y row
-      { r: 'ya', h: 'や', k: 'ヤ', cat: 'y' },
-      { r: 'yu', h: 'ゆ', k: 'ユ', cat: 'y' },
-      { r: 'yo', h: 'よ', k: 'ヨ', cat: 'y' },
-      // R row
-      { r: 'ra', h: 'ら', k: 'ラ', cat: 'r' },
-      { r: 'ri', h: 'り', k: 'リ', cat: 'r' },
-      { r: 'ru', h: 'る', k: 'ル', cat: 'r' },
-      { r: 're', h: 'れ', k: 'レ', cat: 'r' },
-      { r: 'ro', h: 'ろ', k: 'ロ', cat: 'r' },
-      // W row
-      { r: 'wa', h: 'わ', k: 'ワ', cat: 'w' },
-      { r: 'wo', h: 'を', k: 'ヲ', cat: 'w' },
+      { r: 'a', kbd: 'a', kbdAlt: [], h: 'あ', k: 'ア', cat: 'vowels' },
+      { r: 'i', kbd: 'i', kbdAlt: [], h: 'い', k: 'イ', cat: 'vowels' },
+      { r: 'u', kbd: 'u', kbdAlt: [], h: 'う', k: 'ウ', cat: 'vowels' },
+      { r: 'e', kbd: 'e', kbdAlt: [], h: 'え', k: 'エ', cat: 'vowels' },
+      { r: 'o', kbd: 'o', kbdAlt: [], h: 'お', k: 'オ', cat: 'vowels' },
+
+      // K
+      { r: 'ka', kbd: 'ka', kbdAlt: [], h: 'か', k: 'カ', cat: 'k' },
+      { r: 'ki', kbd: 'ki', kbdAlt: [], h: 'き', k: 'キ', cat: 'k' },
+      { r: 'ku', kbd: 'ku', kbdAlt: [], h: 'く', k: 'ク', cat: 'k' },
+      { r: 'ke', kbd: 'ke', kbdAlt: [], h: 'け', k: 'ケ', cat: 'k' },
+      { r: 'ko', kbd: 'ko', kbdAlt: [], h: 'こ', k: 'コ', cat: 'k' },
+
+      // S
+      { r: 'sa', kbd: 'sa', kbdAlt: [], h: 'さ', k: 'サ', cat: 's' },
+      { r: 'shi', kbd: 'si', kbdAlt: ['shi'], h: 'し', k: 'シ', cat: 's' },
+      { r: 'su', kbd: 'su', kbdAlt: [], h: 'す', k: 'ス', cat: 's' },
+      { r: 'se', kbd: 'se', kbdAlt: [], h: 'せ', k: 'セ', cat: 's' },
+      { r: 'so', kbd: 'so', kbdAlt: [], h: 'そ', k: 'ソ', cat: 's' },
+
+      // T
+      { r: 'ta', kbd: 'ta', kbdAlt: [], h: 'た', k: 'タ', cat: 't' },
+      { r: 'chi', kbd: 'ti', kbdAlt: ['chi'], h: 'ち', k: 'チ', cat: 't' },
+      { r: 'tsu', kbd: 'tu', kbdAlt: ['tsu'], h: 'つ', k: 'ツ', cat: 't' },
+      { r: 'te', kbd: 'te', kbdAlt: [], h: 'て', k: 'テ', cat: 't' },
+      { r: 'to', kbd: 'to', kbdAlt: [], h: 'と', k: 'ト', cat: 't' },
+
+      // N
+      { r: 'na', kbd: 'na', kbdAlt: [], h: 'な', k: 'ナ', cat: 'n' },
+      { r: 'ni', kbd: 'ni', kbdAlt: [], h: 'に', k: 'ニ', cat: 'n' },
+      { r: 'nu', kbd: 'nu', kbdAlt: [], h: 'ぬ', k: 'ヌ', cat: 'n' },
+      { r: 'ne', kbd: 'ne', kbdAlt: [], h: 'ね', k: 'ネ', cat: 'n' },
+      { r: 'no', kbd: 'no', kbdAlt: [], h: 'の', k: 'ノ', cat: 'n' },
+
+      // H
+      { r: 'ha', kbd: 'ha', kbdAlt: [], h: 'は', k: 'ハ', cat: 'h' },
+      { r: 'hi', kbd: 'hi', kbdAlt: [], h: 'ひ', k: 'ヒ', cat: 'h' },
+      { r: 'fu', kbd: 'hu', kbdAlt: ['fu'], h: 'ふ', k: 'フ', cat: 'h' },
+      { r: 'he', kbd: 'he', kbdAlt: [], h: 'へ', k: 'ヘ', cat: 'h' },
+      { r: 'ho', kbd: 'ho', kbdAlt: [], h: 'ほ', k: 'ホ', cat: 'h' },
+
+      // M
+      { r: 'ma', kbd: 'ma', kbdAlt: [], h: 'ま', k: 'マ', cat: 'm' },
+      { r: 'mi', kbd: 'mi', kbdAlt: [], h: 'み', k: 'ミ', cat: 'm' },
+      { r: 'mu', kbd: 'mu', kbdAlt: [], h: 'む', k: 'ム', cat: 'm' },
+      { r: 'me', kbd: 'me', kbdAlt: [], h: 'め', k: 'メ', cat: 'm' },
+      { r: 'mo', kbd: 'mo', kbdAlt: [], h: 'も', k: 'モ', cat: 'm' },
+
+      // Y
+      { r: 'ya', kbd: 'ya', kbdAlt: [], h: 'や', k: 'ヤ', cat: 'y' },
+      { r: 'yu', kbd: 'yu', kbdAlt: [], h: 'ゆ', k: 'ユ', cat: 'y' },
+      { r: 'yo', kbd: 'yo', kbdAlt: [], h: 'よ', k: 'ヨ', cat: 'y' },
+
+      // R
+      { r: 'ra', kbd: 'ra', kbdAlt: [], h: 'ら', k: 'ラ', cat: 'r' },
+      { r: 'ri', kbd: 'ri', kbdAlt: [], h: 'り', k: 'リ', cat: 'r' },
+      { r: 'ru', kbd: 'ru', kbdAlt: [], h: 'る', k: 'ル', cat: 'r' },
+      { r: 're', kbd: 're', kbdAlt: [], h: 'れ', k: 'レ', cat: 'r' },
+      { r: 'ro', kbd: 'ro', kbdAlt: [], h: 'ろ', k: 'ロ', cat: 'r' },
+
+      // W
+      { r: 'wa', kbd: 'wa', kbdAlt: [], h: 'わ', k: 'ワ', cat: 'w' },
+      { r: 'wo', kbd: 'wo', kbdAlt: ['o'], h: 'を', k: 'ヲ', cat: 'w' },
+
+      // Dakuten: G
+      { r: 'ga', kbd: 'ga', kbdAlt: [], h: 'が', k: 'ガ', cat: 'g' },
+      { r: 'gi', kbd: 'gi', kbdAlt: [], h: 'ぎ', k: 'ギ', cat: 'g' },
+      { r: 'gu', kbd: 'gu', kbdAlt: [], h: 'ぐ', k: 'グ', cat: 'g' },
+      { r: 'ge', kbd: 'ge', kbdAlt: [], h: 'げ', k: 'ゲ', cat: 'g' },
+      { r: 'go', kbd: 'go', kbdAlt: [], h: 'ご', k: 'ゴ', cat: 'g' },
+
+      // Dakuten: Z
+      { r: 'za', kbd: 'za', kbdAlt: [], h: 'ざ', k: 'ザ', cat: 'z' },
+      { r: 'ji', kbd: 'zi', kbdAlt: ['ji'], h: 'じ', k: 'ジ', cat: 'z' },
+      { r: 'zu', kbd: 'zu', kbdAlt: [], h: 'ず', k: 'ズ', cat: 'z' },
+      { r: 'ze', kbd: 'ze', kbdAlt: [], h: 'ぜ', k: 'ゼ', cat: 'z' },
+      { r: 'zo', kbd: 'zo', kbdAlt: [], h: 'ぞ', k: 'ゾ', cat: 'z' },
+
+      // Dakuten: D
+      { r: 'da', kbd: 'da', kbdAlt: [], h: 'だ', k: 'ダ', cat: 'd' },
+      { r: 'ji', kbd: 'di', kbdAlt: ['ji'], h: 'ぢ', k: 'ヂ', cat: 'd' },
+      { r: 'zu', kbd: 'du', kbdAlt: ['dzu'], h: 'づ', k: 'ヅ', cat: 'd' },
+      { r: 'de', kbd: 'de', kbdAlt: [], h: 'で', k: 'デ', cat: 'd' },
+      { r: 'do', kbd: 'do', kbdAlt: [], h: 'ど', k: 'ド', cat: 'd' },
+
+      // Dakuten: B
+      { r: 'ba', kbd: 'ba', kbdAlt: [], h: 'ば', k: 'バ', cat: 'b' },
+      { r: 'bi', kbd: 'bi', kbdAlt: [], h: 'び', k: 'ビ', cat: 'b' },
+      { r: 'bu', kbd: 'bu', kbdAlt: [], h: 'ぶ', k: 'ブ', cat: 'b' },
+      { r: 'be', kbd: 'be', kbdAlt: [], h: 'べ', k: 'ベ', cat: 'b' },
+      { r: 'bo', kbd: 'bo', kbdAlt: [], h: 'ぼ', k: 'ボ', cat: 'b' },
+
+      // Handakuten: P
+      { r: 'pa', kbd: 'pa', kbdAlt: [], h: 'ぱ', k: 'パ', cat: 'p' },
+      { r: 'pi', kbd: 'pi', kbdAlt: [], h: 'ぴ', k: 'ピ', cat: 'p' },
+      { r: 'pu', kbd: 'pu', kbdAlt: [], h: 'ぷ', k: 'プ', cat: 'p' },
+      { r: 'pe', kbd: 'pe', kbdAlt: [], h: 'ぺ', k: 'ペ', cat: 'p' },
+      { r: 'po', kbd: 'po', kbdAlt: [], h: 'ぽ', k: 'ポ', cat: 'p' },
+
       // Special
-      { r: 'n', h: 'ん', k: 'ン', cat: 'special' },
+      { r: 'n', kbd: 'n', kbdAlt: ["nn", "n'"], h: 'ん', k: 'ン', cat: 'special' },
     ];
+
+    // Append YŌON
+    KANA.push(
+      // KY
+      { r: 'kya', kbd: 'kya', kbdAlt: [], h: 'きゃ', k: 'キャ', cat: 'ky' },
+      { r: 'kyu', kbd: 'kyu', kbdAlt: [], h: 'きゅ', k: 'キュ', cat: 'ky' },
+      { r: 'kyo', kbd: 'kyo', kbdAlt: [], h: 'きょ', k: 'キョ', cat: 'ky' },
+
+      // GY
+      { r: 'gya', kbd: 'gya', kbdAlt: [], h: 'ぎゃ', k: 'ギャ', cat: 'gy' },
+      { r: 'gyu', kbd: 'gyu', kbdAlt: [], h: 'ぎゅ', k: 'ギュ', cat: 'gy' },
+      { r: 'gyo', kbd: 'gyo', kbdAlt: [], h: 'ぎょ', k: 'ギョ', cat: 'gy' },
+
+      // SH
+      { r: 'sha', kbd: 'sya', kbdAlt: ['sha'], h: 'しゃ', k: 'シャ', cat: 'sh' },
+      { r: 'shu', kbd: 'syu', kbdAlt: ['shu'], h: 'しゅ', k: 'シュ', cat: 'sh' },
+      { r: 'sho', kbd: 'syo', kbdAlt: ['sho'], h: 'しょ', k: 'ショ', cat: 'sh' },
+
+      // CH
+      { r: 'cha', kbd: 'tya', kbdAlt: ['cha', 'cya'], h: 'ちゃ', k: 'チャ', cat: 'ch' },
+      { r: 'chu', kbd: 'tyu', kbdAlt: ['chu', 'cyu'], h: 'ちゅ', k: 'チュ', cat: 'ch' },
+      { r: 'cho', kbd: 'tyo', kbdAlt: ['cho', 'cyo'], h: 'ちょ', k: 'チョ', cat: 'ch' },
+
+      // J
+      { r: 'ja', kbd: 'zya', kbdAlt: ['ja', 'jya'], h: 'じゃ', k: 'ジャ', cat: 'j' },
+      { r: 'ju', kbd: 'zyu', kbdAlt: ['ju', 'jyu'], h: 'じゅ', k: 'ジュ', cat: 'j' },
+      { r: 'jo', kbd: 'zyo', kbdAlt: ['jo', 'jyo'], h: 'じょ', k: 'ジョ', cat: 'j' },
+
+      // DY (rare)
+      { r: 'ja', kbd: 'dya', kbdAlt: ['ja', 'jya'], h: 'ぢゃ', k: 'ヂャ', cat: 'dy' },
+      { r: 'ju', kbd: 'dyu', kbdAlt: ['ju', 'jyu'], h: 'ぢゅ', k: 'ヂュ', cat: 'dy' },
+      { r: 'jo', kbd: 'dyo', kbdAlt: ['jo', 'jyo'], h: 'ぢょ', k: 'ヂョ', cat: 'dy' },
+
+      // NY
+      { r: 'nya', kbd: 'nya', kbdAlt: [], h: 'にゃ', k: 'ニャ', cat: 'ny' },
+      { r: 'nyu', kbd: 'nyu', kbdAlt: [], h: 'にゅ', k: 'ニュ', cat: 'ny' },
+      { r: 'nyo', kbd: 'nyo', kbdAlt: [], h: 'にょ', k: 'ニョ', cat: 'ny' },
+
+      // HY
+      { r: 'hya', kbd: 'hya', kbdAlt: [], h: 'ひゃ', k: 'ヒャ', cat: 'hy' },
+      { r: 'hyu', kbd: 'hyu', kbdAlt: [], h: 'ひゅ', k: 'ヒュ', cat: 'hy' },
+      { r: 'hyo', kbd: 'hyo', kbdAlt: [], h: 'ひょ', k: 'ヒョ', cat: 'hy' },
+
+      // BY
+      { r: 'bya', kbd: 'bya', kbdAlt: [], h: 'びゃ', k: 'ビャ', cat: 'by' },
+      { r: 'byu', kbd: 'byu', kbdAlt: [], h: 'びゅ', k: 'ビュ', cat: 'by' },
+      { r: 'byo', kbd: 'byo', kbdAlt: [], h: 'びょ', k: 'ビョ', cat: 'by' },
+
+      // PY
+      { r: 'pya', kbd: 'pya', kbdAlt: [], h: 'ぴゃ', k: 'ピャ', cat: 'py' },
+      { r: 'pyu', kbd: 'pyu', kbdAlt: [], h: 'ぴゅ', k: 'ピュ', cat: 'py' },
+      { r: 'pyo', kbd: 'pyo', kbdAlt: [], h: 'ぴょ', k: 'ピョ', cat: 'py' },
+
+      // MY
+      { r: 'mya', kbd: 'mya', kbdAlt: [], h: 'みゃ', k: 'ミャ', cat: 'my' },
+      { r: 'myu', kbd: 'myu', kbdAlt: [], h: 'みゅ', k: 'ミュ', cat: 'my' },
+      { r: 'myo', kbd: 'myo', kbdAlt: [], h: 'みょ', k: 'ミョ', cat: 'my' },
+
+      // RY
+      { r: 'rya', kbd: 'rya', kbdAlt: [], h: 'りゃ', k: 'リャ', cat: 'ry' },
+      { r: 'ryu', kbd: 'ryu', kbdAlt: [], h: 'りゅ', k: 'リュ', cat: 'ry' },
+      { r: 'ryo', kbd: 'ryo', kbdAlt: [], h: 'りょ', k: 'リョ', cat: 'ry' },
+    );
+
+    const YOON_CATS = new Set(['ky', 'gy', 'sh', 'j', 'ch', 'ny', 'hy', 'by', 'py', 'my', 'ry', 'dy']);
 
     // ===== Helpers =====
     const $ = (sel) => document.querySelector(sel);
     const $$ = (sel) => Array.from(document.querySelectorAll(sel));
 
     function shuffle(arr) {
-      for (let i = arr.length - 1; i > 0; i--) {
+      const a = arr.slice();
+      for (let i = a.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
+        [a[i], a[j]] = [a[j], a[i]];
       }
-      return arr;
+      return a;
     }
-
     function sample(arr, n) {
       const copy = arr.slice();
       shuffle(copy);
@@ -337,111 +474,35 @@
     }
     let mcKeyHandler = null;
 
-    function attachMCShortcuts() {
-      detachMCShortcuts();
-      mcKeyHandler = (e) => {
-        // Only respond on MC questions
-        const q = state.questions[state.index];
-        if (!q || q.kind !== 'mc') return;
-        if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable)) return;
-        if (e.key === '1' || e.key === '2' || e.key === '3' || e.key === '4') {
-          const btn = document.querySelector(`#mcWrap [data-n="${e.key}"]`);
-          if (btn) btn.click();
-        }
-      };
-      document.addEventListener('keydown', mcKeyHandler);
-    }
-
-    function detachMCShortcuts() {
-      if (mcKeyHandler) {
-        document.removeEventListener('keydown', mcKeyHandler);
-        mcKeyHandler = null;
+    function showFeedbackAndAdvance(ok) {
+      if (feedbackEl) {
+        briefFeedback(ok);
       }
+      // Let the user see the mark briefly, then fade out and advance
+      setTimeout(() => {
+        fadeOutQA(() => {
+          if (feedbackEl) feedbackEl.textContent = '';
+          finishQuestionAndAdvance(); // will call fadeInQA() afterwards
+        });
+      }, 300);
     }
 
-    function fadeOutQA(cb) {
-      // fade whole question area (prompt + hint + feedback + answers)
-      questionPromptEl.style.opacity = '0';
-      // wait for CSS transition (500ms) + a tiny buffer
-      setTimeout(cb, 550);
-    }
-
-    function fadeInQA() {
-      questionPromptEl.style.opacity = '0';
-      // next tick to trigger the transition properly
-      requestAnimationFrame(() => {
-        questionPromptEl.style.opacity = '1';
-      });
-    }
-
-    // ===== State =====
-    const state = {
-      quizType: 'kataToRoma',
-      poolCats: ['vowels', 'k', 's', 't', 'n', 'h', 'm', 'y', 'r', 'w'],
-      repetitions: 1,
-      answerMode: 'mc', // 'text' | 'mc' | 'draw'
-      questions: [],
-      index: 0,
-      score: 0,
-      wrong: []
-    };
-
-    // ===== UI Refs =====
-    const mainMenu = $('#mainMenu');
-    const quizScreen = $('#quizScreen');
-    const scoreScreen = $('#scoreScreen');
-
-    const startBtn = $('#startQuiz');
-    const progressEl = $('#progress');
-    const feedbackEl = $('#feedback');
-    const promptBig = $('#promptBig');
-    const promptHint = $('#promptHint');
-
-    const textAnswerWrap = $('#textAnswerWrap');
-    const textAnswer = $('#textAnswer');
-
-    const mcWrap = $('#mcWrap');
-
-    const drawWrap = $('#drawWrap');
-    const drawCanvas = $('#drawCanvas');
-    const clearCanvasBtn = $('#clearCanvas');
-    const revealBtn = $('#revealCorrect');
-    const revealArea = $('#revealArea');
-    const correctGlyph = $('#correctGlyph');
-    const selfMarkRight = $('#selfMarkRight');
-    const selfMarkWrong = $('#selfMarkWrong');
-    const questionPromptEl = $('#questionPrompt');
-    const scoreSummary = $('#scoreSummary');
-    const wrongAnswersDiv = $('#wrongAnswers');
-
-    const referenceScreen = document.getElementById('referenceScreen');
-    const openReference = document.getElementById('openReference');
-    const kanaTable = document.getElementById('kanaTable');
-
-
-    // Answer mode radios + labels
-    const modeText = $('#answerModeText');
-    const modeMC = $('#answerModeMC');
-    const modeDraw = $('#answerModeDraw');
-    const modeTextLabel = $('#modeTextLabel');
-    const modeMCLabel = $('#modeMCLabel');
-    const modeDrawLabel = $('#modeDrawLabel');
-
-    // Distractor toggle
-    const distractorSelectedOnly = $('#distractorSelectedOnly');
-    const distractorLabel = $('#distractorLabel');
-
-    const FEEDBACK_BASE = 'text-3xl font-semibold mb-4 h-10';
-
-    // ===== Build Question Pool =====
+    // ===== Build sets, presets, meta =====
     function buildBaseSet(poolCats) {
-      return KANA.filter(k => poolCats.includes(k.cat));
+      const chosen = new Set(poolCats);
+      return KANA.filter(k =>
+        chosen.has(k.cat) ||
+        (chosen.has('yoon') && YOON_CATS.has(k.cat))
+      );
     }
+
     function expandWithRepetitions(arr, reps) {
       const out = [];
       for (let i = 0; i < reps; i++) out.push(...arr.map(x => ({ ...x })));
       return out;
     }
+
+
 
     function selectedQuizMeta(quizType) {
       switch (quizType) {
@@ -456,125 +517,137 @@
       }
     }
 
-    function deriveKind(answerMode, to) {
-      // Romaji: allow text or MC (no drawing)
-      if (to === 'romaji') return (answerMode === 'mc' ? 'mc' : 'text');
-      // Kana: MC or drawing
-      return (answerMode === 'draw' ? 'draw' : 'mc');
-    }
-
     function createQuestions(quizType, poolCats, repetitions, answerMode) {
       const meta = selectedQuizMeta(quizType);
       const base = buildBaseSet(poolCats);
 
-      // Build source "units" (one unit = one prompt/correct pair) BEFORE repetitions
       let units = [];
 
       if (meta.from === 'mixedKana') {
-        // Ensure BOTH scripts (hiragana + katakana) are represented for each item
         base.forEach(item => {
-          // Hiragana prompt
           units.push({
             prompt: item.h,
-            correct: meta.to === 'romaji' ? item.r
-              : meta.to === 'hiragana' ? item.h
-                : item.k
+            correct: meta.to === 'romaji' ? item.r : meta.to === 'hiragana' ? item.h : item.k,
+            acceptable: meta.to === 'romaji' ? new Set([item.r, item.kbd, ...(item.kbdAlt || [])].map(s => s.toLowerCase())) : null
           });
-          // Katakana prompt
           units.push({
             prompt: item.k,
-            correct: meta.to === 'romaji' ? item.r
-              : meta.to === 'hiragana' ? item.h
-                : item.k
+            correct: meta.to === 'romaji' ? item.r : meta.to === 'hiragana' ? item.h : item.k,
+            acceptable: meta.to === 'romaji' ? new Set([item.r, item.kbd, ...(item.kbdAlt || [])].map(s => s.toLowerCase())) : null
           });
         });
       } else {
-        // All other quiz types behave as before (single script source)
         base.forEach(item => {
           const prompt =
             meta.from === 'katakana' ? item.k :
               meta.from === 'hiragana' ? item.h :
-        /* romaji */              item.r;
+                item.r;
 
           const correct =
             meta.to === 'romaji' ? item.r :
               meta.to === 'hiragana' ? item.h :
                 item.k;
 
-          units.push({ prompt, correct });
+          const acceptable = (meta.to === 'romaji')
+            ? new Set([item.r, item.kbd, ...(item.kbdAlt || [])].map(s => s.toLowerCase()))
+            : null;
+
+          units.push({ prompt, correct, acceptable });
         });
       }
 
-      // Apply repetitions AFTER ensuring both scripts are present (for mixedKana)
       const sourceExpanded = expandWithRepetitions(units, repetitions);
+      const kind = (answerMode === 'mc') ? 'mc' : (answerMode === 'draw' && (selectedQuizMeta(quizType).to !== 'romaji')) ? 'draw' : 'text';
 
-      const kind = deriveKind(answerMode, meta.to);
-
-      const q = sourceExpanded.map(({ prompt, correct }) => {
-        // Explicit hints
+      const q = shuffle(sourceExpanded).map(u => {
         let hint = '';
-        if (kind === 'text') hint = 'Type the romaji';
+        if (kind === 'text' && meta.to === 'romaji') hint = 'Type romaji (IME kbd or phonetic)';
         else if (kind === 'mc') hint = `Pick the correct ${meta.to}`;
         else if (kind === 'draw') hint = `Draw the ${meta.to}`;
 
-        return { kind, prompt, correct, hint, meta };
+        return { kind, prompt: u.prompt, correct: u.correct, acceptable: u.acceptable, meta };
       });
-
-      return shuffle(q);
+      return q;
     }
 
+    // ===== UI =====
+    const state = {
+      questions: [],
+      index: 0,
+      score: 0,
+      wrong: [],
+      poolCats: ['vowels', 'k', 's', 't', 'n', 'h', 'm', 'y', 'r', 'w', 'special', 'g', 'z', 'd', 'b', 'p', 'yoon'],
+    };
 
-    // ===== Answer mode availability =====
+    const questionPromptEl = document.getElementById('questionPrompt');
+    const promptHint = document.getElementById('promptHint');
+    const textAnswerWrap = document.getElementById('textAnswerWrap');
+    const textAnswer = document.getElementById('textAnswer');
+    const mcWrap = document.getElementById('mcWrap');
+    const drawWrap = document.getElementById('drawWrap');
+    const drawCanvas = document.getElementById('drawCanvas');
+    const clearCanvasBtn = document.getElementById('clearCanvas');
+    const revealBtn = document.getElementById('revealCorrect');
+    const revealArea = document.getElementById('revealArea');
+    const correctGlyph = document.getElementById('correctGlyph');
+
+    const scoreNow = document.getElementById('scoreNow');
+    const scoreSummary = document.getElementById('scoreSummary');
+    const wrongAnswers = document.getElementById('wrongAnswers');
+    const qIndex = document.getElementById('qIndex');
+    const qTotal = document.getElementById('qTotal');
+
+    const modeText = document.getElementById('answerModeText');
+    const modeMC = document.getElementById('answerModeMC');
+    const modeDraw = document.getElementById('answerModeDraw');
+
+    const distractorRow = document.getElementById('distractorRow');
+    const distractorSelectedOnly = document.getElementById('distractorSelectedOnly');
+    const feedbackEl = document.getElementById('feedback');
+    const FEEDBACK_BASE = 'h-6 text-2xl';
+
+    const FADE_TARGETS = [questionPromptEl, feedbackEl, textAnswerWrap, mcWrap, drawWrap];
+
+    function showScreen(targetId) {
+      ['mainMenu', 'quizScreen', 'scoreScreen', 'referenceScreen'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (id === targetId) el.classList.remove('hidden');
+        else el.classList.add('hidden');
+      });
+    }
+
+    // Answer mode availability (same UI, no style changes)
     function updateAnswerModeAvailability() {
-      const quizType = ($$('input[name="quizType"]:checked')[0] || {}).value || 'kataToRoma';
-      const { to } = selectedQuizMeta(quizType);
-
-      const typingAllowed = (to === 'romaji');
-      const mcAllowed = (to === 'romaji' || to === 'hiragana' || to === 'katakana');
-      const drawAllowed = (to === 'hiragana' || to === 'katakana');
-
-      // Typing
-      modeText.disabled = !typingAllowed;
-      modeTextLabel.classList.toggle('disabled', !typingAllowed);
-      if (!typingAllowed && modeText.checked) modeText.checked = false;
-
-      // MC & Draw
-      modeMC.disabled = !mcAllowed;
-      modeDraw.disabled = !drawAllowed;
-      modeMCLabel.classList.toggle('disabled', !mcAllowed);
-      modeDrawLabel.classList.toggle('disabled', !drawAllowed);
-
-      // Ensure one valid mode
-      if (!modeMC.checked && !modeText.checked && !modeDraw.checked) {
-        if (mcAllowed) modeMC.checked = true;
-        else if (typingAllowed) modeText.checked = true;
-      }
-
-      // Kana MC-only toggle visibility
-      const kanaAnswer = (to === 'hiragana' || to === 'katakana');
-      const enableDistractor = kanaAnswer && mcAllowed && modeMC.checked && !modeMC.disabled;
-      distractorSelectedOnly.disabled = !enableDistractor;
-      distractorLabel.classList.toggle('disabled', !enableDistractor);
-
-      if (!kanaAnswer) {
-        if (modeDraw.checked) modeDraw.checked = false;
-        if (!modeMC.checked && typingAllowed) modeText.checked = true;
-      }
+      const quizType = (document.querySelector('input[name="quizType"]:checked') || {}).value || 'kataToRoma';
+      const meta = selectedQuizMeta(quizType);
+      // Typing always available
+      modeText.disabled = false;
+      document.getElementById('modeTextLabel').classList.toggle('opacity-50', false);
+      // MC always available
+      modeMC.disabled = false;
+      document.getElementById('modeMCLabel').classList.toggle('opacity-50', false);
+      // Draw only when answering to kana
+      const drawOK = (meta.to === 'hiragana' || meta.to === 'katakana');
+      modeDraw.disabled = !drawOK;
+      document.getElementById('modeDrawLabel').classList.toggle('opacity-50', !drawOK);
+      distractorRow.classList.toggle('hidden', !(meta.to !== 'romaji' && modeMC.checked));
+      document.getElementById('distractorLabel').classList.toggle('opacity-50', !(meta.to !== 'romaji' && modeMC.checked));
     }
 
-    // Wire updates
     $$('.grid input[name="quizType"]').forEach(r => r.addEventListener('change', updateAnswerModeAvailability));
     $$('input[name="answerMode"]').forEach(r => r.addEventListener('change', updateAnswerModeAvailability));
     updateAnswerModeAvailability();
 
-    // ===== Presets =====
+    // Presets (added dakuten/handakuten + yoon aggregate)
     function setPools(values) {
       const boxes = $$('.charPool');
       const set = new Set(values);
       boxes.forEach(b => { b.checked = set.has(b.value); });
+      state.poolCats = values.slice();
     }
     function applyPreset(key) {
-      const ALL = ['vowels', 'k', 's', 't', 'n', 'h', 'm', 'y', 'r', 'w', 'special'];
+      const ALL = ['vowels', 'k', 's', 't', 'n', 'h', 'm', 'y', 'r', 'w', 'special', 'g', 'z', 'd', 'b', 'p', 'yoon'];
       switch (key) {
         case 'kst': setPools(['k', 's', 't']); break;
         case 'vowelsY': setPools(['vowels', 'y']); break;
@@ -589,343 +662,370 @@
       applyPreset(btn.getAttribute('data-preset'));
     });
 
-    document.addEventListener('DOMContentLoaded', () => {
-      document.addEventListener('click', (e) => {
-        const backBtn = e.target.closest('.js-back-menu');
-        if (backBtn) {
-          // show menu; hide all other screens
-          referenceScreen.classList.add('hidden');
-          scoreScreen.classList.add('hidden');
-          quizScreen.classList.add('hidden');
-          mainMenu.classList.remove('hidden');
+    // Pool checkboxes
+    $$('.charPool').forEach(cb => {
+      cb.addEventListener('change', () => {
+        if (cb.checked) {
+          if (!state.poolCats.includes(cb.value)) state.poolCats.push(cb.value);
+        } else {
+          state.poolCats = state.poolCats.filter(v => v !== cb.value);
         }
       });
     });
 
-    // ===== Flow =====
-    startBtn.addEventListener('click', startQuiz);
+    // Start / Back / Reference
+    document.getElementById('startQuiz').addEventListener('click', () => {
+      const quizType = (document.querySelector('input[name="quizType"]:checked') || {}).value || 'kataToRoma';
+      const answerMode = (document.querySelector('input[name="answerMode"]:checked') || {}).value || 'mc';
+      const reps = Math.max(1, parseInt(document.getElementById('repetitions').value || '1', 10));
 
-    function startQuiz() {
-      const quizType = ($$('input[name="quizType"]:checked')[0] || {}).value || 'kataToRoma';
-      const poolCats = $$('.charPool:checked').map(x => x.value);
-      const repetitions = Math.max(1, parseInt($('#repetitions').value || '1', 10));
-      const answerMode = ($$('input[name="answerMode"]:checked')[0] || {}).value || 'mc';
-
-      state.quizType = quizType;
-      state.poolCats = poolCats.length ? poolCats : ['vowels'];
-      state.repetitions = repetitions;
-      state.answerMode = answerMode;
-
-      state.questions = createQuestions(state.quizType, state.poolCats, state.repetitions, state.answerMode);
+      const poolList = state.poolCats.slice();
+      state.questions = createQuestions(quizType, poolList, reps, answerMode);
       state.index = 0;
       state.score = 0;
       state.wrong = [];
 
-      mainMenu.classList.add('hidden');
-      scoreScreen.classList.add('hidden');
-      quizScreen.classList.remove('hidden');
+      qTotal.textContent = state.questions.length;
+      scoreNow.textContent = 0;
 
-      questionPromptEl.style.opacity = '0';
-      renderQuestion();
-      fadeInQA();
-    }
+      showScreen('quizScreen');
+      showQuestion();
+    });
 
-    function renderQuestion() {
-      const i = state.index;
-      const total = state.questions.length;
-      progressEl.textContent = `Question ${i + 1} / ${total}`;
-      feedbackEl.textContent = '';
-      feedbackEl.className = FEEDBACK_BASE;
-      //start hidden
-      questionPromptEl.style.opacity = '0';
+    $$('.js-back-menu').forEach(b => b.addEventListener('click', () => showScreen('mainMenu')));
 
-      const q = state.questions[i];
-      promptBig.textContent = q.prompt;
-      promptHint.textContent = q.hint;
+    document.getElementById('openReference').addEventListener('click', () => {
+      showScreen('referenceScreen');
+      buildKanaTable();
+    });
 
-      detachMCShortcuts();
+    // Render Question
+    function showQuestion() {
+      const q = state.questions[state.index];
+      qIndex.textContent = state.index + 1;
+      questionPromptEl.textContent = q.prompt;
 
-      // reset UI
-      textAnswerWrap.classList.add('hidden');
-      mcWrap.classList.add('hidden');
-      drawWrap.classList.add('hidden');
-      revealArea.classList.add('hidden');
+      if (q.kind === 'text' && q.meta.to === 'romaji') {
+        promptHint.textContent = 'Type romaji (IME kbd or phonetic), Enter to submit';
+      } else if (q.kind === 'mc') {
+        promptHint.textContent = `Pick the correct ${q.meta.to}`;
+      } else if (q.kind === 'draw') {
+        promptHint.textContent = `Draw the ${q.meta.to}`;
+      } else {
+        promptHint.textContent = '';
+      }
+
+      textAnswerWrap.classList.toggle('hidden', q.kind !== 'text');
+      mcWrap.innerHTML = '';
+      mcWrap.classList.toggle('hidden', q.kind !== 'mc');
+      drawWrap.classList.toggle('hidden', q.kind !== 'draw');
 
       if (q.kind === 'text') {
-        textAnswerWrap.classList.remove('hidden');
         textAnswer.value = '';
         textAnswer.focus();
       } else if (q.kind === 'mc') {
-        mcWrap.innerHTML = '';
-        mcWrap.classList.remove('hidden');
-
-        // Build options
-        const targetIsKana = (q.meta.to === 'hiragana' || q.meta.to === 'katakana');
-        let pool = [];
-
-        if (targetIsKana) {
-          const useSelected = distractorSelectedOnly.checked;
-          if (useSelected) {
-            const base = buildBaseSet(state.poolCats);
-            pool = base.flatMap(x => [x.h, x.k]); // both scripts
-          } else {
-            pool = KANA.flatMap(x => [x.h, x.k]); // all kana
-          }
-        } else if (q.meta.to === 'romaji') {
-          // Romaji MC = selected pools only (focused practice)
-          const base = buildBaseSet(state.poolCats);
-          pool = base.map(x => x.r);
-        }
-
-        const correct = q.correct;
-        const distractors = sample(pool.filter(x => x !== correct), 3);
-        const options = shuffle([correct, ...distractors]);
-
-        options.forEach((opt, idx) => {
-          const n = idx + 1; // 1..4
-          const btn = document.createElement('button');
-          btn.className = 'w-full border border-gray-600 rounded-xl py-4 text-2xl bg-gray-800 hover:bg-gray-700 active:bg-gray-600 transition flex items-center justify-center gap-3';
-          btn.setAttribute('data-n', String(n));
-          btn.setAttribute('aria-label', `Option ${n}: ${opt}`);
-          btn.innerHTML = `
-            <span class="inline-flex items-center justify-center w-6 h-6 rounded-md border border-gray-600 text-sm">${n}</span>
-            <span>${opt}</span>
-          `;
-          btn.onclick = () => submitMC(opt === correct, opt, correct, q);
-          mcWrap.appendChild(btn);
-        });
-        attachMCShortcuts();
+        renderMC(q);
       } else if (q.kind === 'draw') {
-        drawWrap.classList.remove('hidden');
         initCanvas();
+        revealArea.classList.add('hidden');
       }
     }
 
-    function briefFeedback(ok) {
-      feedbackEl.textContent = ok ? '✅' : '❌';
-      feedbackEl.className = `${FEEDBACK_BASE} ${ok ? "text-green-400" : "text-red-400"}`;
-    }
-
-    function finishQuestionAndAdvance() {
-      detachMCShortcuts();
-      setTimeout(() => {
-        fadeOutQA(() => {
-          // clear feedback text before next render
-          feedbackEl.textContent = '';
-          state.index++;
-          if (state.index >= state.questions.length) {
-            showScore();
-            return;
-          }
-          renderQuestion();
-          // quick fade-in of the new screen
-          fadeInQA();
-        });
-      }, 200);
-    }
-
-    // Text answers
-    textAnswer.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
+    // Typing submit (accept kbd/phon variants)
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !textAnswerWrap.classList.contains('hidden')) {
         const q = state.questions[state.index];
         const user = (textAnswer.value || '').trim().toLowerCase();
         const correct = (q.correct || '').toLowerCase();
-        const ok = user === correct;
+
+        let ok = false;
+        if (q.acceptable instanceof Set) ok = q.acceptable.has(user);
+        else ok = (user === correct);
+
         if (!ok) {
           state.wrong.push({ prompt: q.prompt, user, correct });
         } else {
           state.score++;
+          scoreNow.textContent = state.score;
         }
-        briefFeedback(ok);
-        finishQuestionAndAdvance();
+        showFeedbackAndAdvance(ok);
       }
     });
 
-    // MC answers
-    function submitMC(ok, user, correct, q) {
-      if (!ok) {
-        state.wrong.push({ prompt: q.prompt, user, correct });
-      } else {
-        state.score++;
-      }
-      briefFeedback(ok);
-      finishQuestionAndAdvance();
-    }
+    // MC rendering
+    function renderMC(q) {
+      mcWrap.innerHTML = '';
+      const pool = buildBaseSet(state.poolCats.slice());
+      const distractors = shuffle(pool.filter(x => {
+        const ans = q.correct;
+        return (ans !== x.r && ans !== x.h && ans !== x.k);
+      })).slice(0, 3);
 
-    // Drawing mode
-    let ctx, drawing = false, last = null;
+      const options = [q.correct, ...distractors.map(d =>
+        q.meta.to === 'romaji' ? d.r : (q.meta.to === 'hiragana' ? d.h : d.k)
+      )];
 
-    function initCanvas() {
-      const ratio = window.devicePixelRatio || 1;
-      const style = getComputedStyle(drawCanvas);
-      const cssWidth = parseInt(style.width);
-      const cssHeight = parseInt(style.height);
-      drawCanvas.width = cssWidth * ratio;
-      drawCanvas.height = cssHeight * ratio;
-      ctx = drawCanvas.getContext('2d');
-      ctx.scale(ratio, ratio);
-      ctx.lineWidth = 6;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      ctx.strokeStyle = '#e5e7eb'; // light stroke on dark bg
-      clearCanvas();
-    }
-
-    function clearCanvas() {
-      const style = getComputedStyle(drawCanvas);
-      ctx.clearRect(0, 0, parseInt(style.width), parseInt(style.height));
-      ctx.fillStyle = '#111827'; // dark gray
-      ctx.fillRect(0, 0, parseInt(style.width), parseInt(style.height));
-    }
-
-    function getPos(e) {
-      const rect = drawCanvas.getBoundingClientRect();
-      const isTouch = e.touches && e.touches[0];
-      const clientX = isTouch ? e.touches[0].clientX : e.clientX;
-      const clientY = isTouch ? e.touches[0].clientY : e.clientY;
-      return { x: clientX - rect.left, y: clientY - rect.top };
-    }
-
-    function startDraw(e) { drawing = true; last = getPos(e); }
-    function moveDraw(e) {
-      if (!drawing) return;
-      const pos = getPos(e);
-      ctx.beginPath(); ctx.moveTo(last.x, last.y); ctx.lineTo(pos.x, pos.y); ctx.stroke();
-      last = pos;
-    }
-    function endDraw() { drawing = false; last = null; }
-
-    drawCanvas.addEventListener('mousedown', startDraw);
-    drawCanvas.addEventListener('mousemove', moveDraw);
-    window.addEventListener('mouseup', endDraw);
-    drawCanvas.addEventListener('touchstart', (e) => { e.preventDefault(); startDraw(e); });
-    drawCanvas.addEventListener('touchmove', (e) => { e.preventDefault(); moveDraw(e); });
-    drawCanvas.addEventListener('touchend', (e) => { e.preventDefault(); endDraw(e); });
-
-    clearCanvasBtn.addEventListener('click', clearCanvas);
-
-    revealBtn.addEventListener('click', () => {
-      const q = state.questions[state.index];
-      correctGlyph.textContent = q.correct;
-      revealArea.classList.remove('hidden');
-    });
-
-    selfMarkRight.addEventListener('click', () => {
-      state.score++;
-      briefFeedback(true);
-      finishQuestionAndAdvance();
-    });
-    selfMarkWrong.addEventListener('click', () => {
-      const q = state.questions[state.index];
-      state.wrong.push({ prompt: q.prompt, user: '[drawing]', correct: q.correct });
-      briefFeedback(false);
-      finishQuestionAndAdvance();
-    });
-
-    // Score Screen
-    function showScore() {
-      quizScreen.classList.add('hidden');
-      scoreScreen.classList.remove('hidden');
-      const total = state.questions.length;
-      scoreSummary.textContent = `${state.score} / ${total}`;
-
-      if (state.wrong.length === 0) {
-        wrongAnswersDiv.innerHTML = `<p class="text-green-400">Perfect score! 🎉</p>`;
-      } else {
-        wrongAnswersDiv.innerHTML = `
-          <h3 class="font-semibold">Review</h3>
-          <div class="divide-y divide-gray-700">
-            ${state.wrong.map(w => `
-              <div class="py-2 flex items-center justify-between gap-3">
-                <span class="text-xl">${w.prompt}</span>
-                <span class="text-sm">Correct: <span class="badge bg-blue-900 text-blue-100">${w.correct}</span></span>
-                <span class="text-sm text-gray-400">Your answer: <span class="badge bg-gray-700 text-gray-100">${escapeHTML(String(w.user))}</span></span>
-              </div>
-            `).join('')}
-          </div>
-        `;
-      }
-    }
-
-    // Reference chart
-    function escapeHTML(str) {
-      return str.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', '\'': '&#39;' }[c]));
-    }
-
-    function buildKanaTable() {
-      // Index by romaji for quick lookup
-      const byR = Object.fromEntries(KANA.map(k => [k.r, k]));
-
-      // Column order
-      const V = ['a', 'i', 'u', 'e', 'o'];
-
-      // Rows with explicit romaji for each column (null = empty cell)
-      const GOJUON = [
-        { label: '—', name: 'vowels', seq: ['a', 'i', 'u', 'e', 'o'] },
-        { label: 'K', name: 'k', seq: ['ka', 'ki', 'ku', 'ke', 'ko'] },
-        { label: 'S', name: 's', seq: ['sa', 'shi', 'su', 'se', 'so'] },
-        { label: 'T', name: 't', seq: ['ta', 'chi', 'tsu', 'te', 'to'] },
-        { label: 'N', name: 'n', seq: ['na', 'ni', 'nu', 'ne', 'no'] },
-        { label: 'H', name: 'h', seq: ['ha', 'hi', 'fu', 'he', 'ho'] },
-        { label: 'M', name: 'm', seq: ['ma', 'mi', 'mu', 'me', 'mo'] },
-        { label: 'Y', name: 'y', seq: ['ya', null, 'yu', null, 'yo'] },
-        { label: 'R', name: 'r', seq: ['ra', 'ri', 'ru', 're', 'ro'] },
-        { label: 'W', name: 'w', seq: ['wa', null, null, null, 'wo'] },
-      ];
-
-      // Build table HTML
-      let html = `
-    <table class="w-full border border-gray-700 rounded-xl overflow-hidden text-left">
-      <thead class="bg-gray-900">
-        <tr>
-          <th class="px-3 py-2 text-xs font-semibold text-gray-400 border-b border-gray-700 w-14">Row</th>
-          ${V.map(v => `<th class="px-3 py-2 text-xs font-semibold text-gray-400 border-b border-gray-700 uppercase">${v}</th>`).join('')}
-        </tr>
-      </thead>
-      <tbody>
-        ${GOJUON.map(row => `
-          <tr class="hover:bg-gray-800/60">
-            <th class="px-3 py-2 text-sm text-gray-300 border-t border-gray-700">${row.label}</th>
-            ${row.seq.map(r => {
-        if (!r) return `<td class="px-3 py-3 border-t border-gray-700 text-gray-600">—</td>`;
-        const k = byR[r];
-        if (!k) return `<td class="px-3 py-3 border-t border-gray-700 text-gray-600">—</td>`;
-        return `
-                <td class="px-3 py-3 border-t border-gray-700 align-middle">
-                  <div class="flex items-baseline gap-3">
-                    <div class="text-2xl">${k.h}</div>
-                    <div class="text-2xl">${k.k}</div>
-                    <div class="text-xs text-gray-400">${k.r}</div>
-                  </div>
-                </td>
-              `;
-      }).join('')}
-          </tr>
-        `).join('')}
-      </tbody>
-    </table>
-  `;
-
-      kanaTable.innerHTML = html;
-    }
-
-
-    // Added by patch: make Kana Chart button work
-    let kanaBuilt = false;
-    if (typeof openReference !== 'undefined' && openReference) {
-      openReference.addEventListener('click', () => {
-        try {
-          if (!kanaBuilt && typeof buildKanaTable === 'function') { buildKanaTable(); kanaBuilt = true; }
-        } catch (e) { console.error('Error building kana table:', e); }
-        mainMenu.classList.add('hidden');
-        quizScreen.classList.add('hidden');
-        scoreScreen.classList.add('hidden');
-        referenceScreen.classList.remove('hidden');
+      shuffle(options).forEach((opt, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'btn btn-secondary';
+        btn.textContent = opt;
+        btn.addEventListener('click', () => {
+          const ok = (opt.toString().toLowerCase() === q.correct.toString().toLowerCase());
+          if (!ok) state.wrong.push({ prompt: q.prompt, user: opt, correct: q.correct });
+          else { state.score++; scoreNow.textContent = state.score; }
+          showFeedbackAndAdvance(ok);
+        });
+        mcWrap.appendChild(btn);
       });
     }
 
+    // Drawing mode (unchanged styles)
+    let ctx, drawing = false, last = null;
+    function initCanvas() {
+      const ratio = window.devicePixelRatio || 1;
+      const style = getComputedStyle(drawCanvas);
+      const cssW = parseFloat(style.width);
+      drawCanvas.width = Math.floor(cssW * ratio);
+      drawCanvas.height = Math.floor(220 * ratio);
 
-    // Added by patch: keep canvas crisp on resize when draw mode visible
+      ctx = drawCanvas.getContext('2d');
+      ctx.scale(ratio, ratio);
+      ctx.lineWidth = 3;
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = '#e5e7eb';
+
+      drawCanvas.onpointerdown = (e) => { drawing = true; last = { x: e.offsetX, y: e.offsetY }; };
+      drawCanvas.onpointermove = (e) => {
+        if (!drawing) return;
+        ctx.beginPath();
+        ctx.moveTo(last.x, last.y);
+        ctx.lineTo(e.offsetX, e.offsetY);
+        ctx.stroke();
+        last = { x: e.offsetX, y: e.offsetY };
+      };
+      window.onpointerup = () => { drawing = false; };
+
+      clearCanvasBtn.onclick = () => {
+        ctx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+      };
+      revealBtn.onclick = () => {
+        const q = state.questions[state.index];
+        revealArea.classList.remove('hidden');
+        correctGlyph.textContent = q.correct;
+      };
+      document.getElementById('selfMarkRight').onclick = () => {
+        state.score++; scoreNow.textContent = state.score; showFeedbackAndAdvance(true);;
+      };
+      document.getElementById('selfMarkWrong').onclick = () => {
+        const q = state.questions[state.index];
+        state.wrong.push({ prompt: q.prompt, user: '[draw]', correct: q.correct });
+        showFeedbackAndAdvance(false);
+      };
+    }
+
+    function fadeOutQA(cb) {
+      // Fade prompt + feedback + whichever answer block is visible
+      FADE_TARGETS.forEach(el => { if (el && !el.classList.contains('hidden')) el.style.opacity = '0'; });
+      setTimeout(cb, 550); // match .duration-500
+    }
+
+    function fadeInQA() {
+      // Start invisible (so new content fades in)
+      FADE_TARGETS.forEach(el => { if (el && !el.classList.contains('hidden')) el.style.opacity = '0'; });
+      requestAnimationFrame(() => {
+        FADE_TARGETS.forEach(el => { if (el && !el.classList.contains('hidden')) el.style.opacity = '1'; });
+      });
+    }
+
+    function briefFeedback(ok) {
+      feedbackEl.textContent = ok ? '✅' : '❌';
+      feedbackEl.className = `${FEEDBACK_BASE} ${ok ? 'text-green-400' : 'text-red-400'}`;
+    }
+
+    function finishQuestionAndAdvance() {
+      state.index++;
+      if (state.index >= state.questions.length) {
+        showScreen('scoreScreen');
+        scoreSummary.textContent = `Score: ${state.score}/${state.questions.length}`;
+        if (state.wrong.length) {
+          wrongAnswers.innerHTML = state.wrong.map(w =>
+            `<div class="text-sm text-gray-300"><span class="text-gray-400">Prompt:</span> ${w.prompt} &nbsp; <span class="text-gray-400">Your answer:</span> ${w.user} &nbsp; <span class="text-gray-400">Correct:</span> ${w.correct}</div>`
+          ).join('');
+        } else {
+          wrongAnswers.innerHTML = `<div class="text-sm text-emerald-400">Flawless!</div>`;
+        }
+        return;
+      }
+      showQuestion();
+      fadeInQA();
+    }
+
+    document.getElementById('nextQ').addEventListener('click', () => {
+      fadeOutQA(() => {
+        if (feedbackEl) feedbackEl.textContent = '';
+        finishQuestionAndAdvance();
+      });
+    });
+
+    // ===== Reference Table (same visual style, new content) =====
+    function buildKanaTable() {
+      // Keep first occurrence for simple (non-ambiguous) lookups…
+      const byR = {};
+      // …and a precise map keyed by r|cat to disambiguate j vs dy, etc.
+      const byKey = {};
+      for (const k of KANA) {
+        if (!byR[k.r]) byR[k.r] = k;            // preserve FIRST seen for that romaji
+        byKey[`${k.r}|${k.cat}`] = k;           // exact match for category-specific lookups
+      }
+
+
+      // Main gojūon header (A/I/U/E/O) — each vowel expands to Kana | kbd | phon
+      const V = ['a', 'i', 'u', 'e', 'o'];
+      const GOJUON = [
+        { label: '—', seq: ['a', 'i', 'u', 'e', 'o'] },
+        { label: 'K', seq: ['ka', 'ki', 'ku', 'ke', 'ko'] },
+        { label: 'S', seq: ['sa', 'shi', 'su', 'se', 'so'] },
+        { label: 'T', seq: ['ta', 'chi', 'tsu', 'te', 'to'] },
+        { label: 'N', seq: ['na', 'ni', 'nu', 'ne', 'no'] },
+        { label: 'H', seq: ['ha', 'hi', 'fu', 'he', 'ho'] },
+        { label: 'M', seq: ['ma', 'mi', 'mu', 'me', 'mo'] },
+        { label: 'Y', seq: ['ya', null, 'yu', null, 'yo'] },
+        { label: 'R', seq: ['ra', 'ri', 'ru', 're', 'ro'] },
+        { label: 'W', seq: ['wa', null, null, null, 'wo'] },
+        { label: 'G', seq: ['ga', 'gi', 'gu', 'ge', 'go'] },
+        { label: 'Z', seq: ['za', 'ji', 'zu', 'ze', 'zo'] },
+        { label: 'D', seq: ['da', 'ji', 'zu', 'de', 'do'] },
+        { label: 'B', seq: ['ba', 'bi', 'bu', 'be', 'bo'] },
+        { label: 'P', seq: ['pa', 'pi', 'pu', 'pe', 'po'] },
+      ];
+
+      // --- Main table header (A/I/U/E/O grouped) ---
+      const mainHead = `
+  <thead>
+    <tr>
+      <th class="px-3 py-2 text-xs font-semibold text-gray-400 border-b border-gray-700 w-14" rowspan="2" scope="col">Row</th>
+      ${V.map(v => `
+        <th class="px-3 py-2 text-xs font-semibold text-gray-400 border-b border-gray-700 uppercase text-center" colspan="3" scope="colgroup">${v}</th>
+      `).join('')}
+    </tr>
+    <tr>
+      ${V.map(() => `
+        <th class="px-3 py-2 text-xs font-semibold text-gray-400 border-b border-gray-700 text-center" scope="col">Kana</th>
+        <th class="px-2 py-2 text-xs font-semibold text-gray-400 border-b border-gray-700 text-center whitespace-nowrap" scope="col">kbd&nbsp;</th>
+        <th class="px-2 py-2 text-xs font-semibold text-gray-400 border-b border-gray-700 text-center whitespace-nowrap" scope="col">phon</th>
+      `).join('')}
+    </tr>
+  </thead>`;
+
+
+      let mainBody = '<tbody>';
+      for (const row of GOJUON) {
+        mainBody += `<tr class="hover:bg-gray-800/60">
+          <th class="px-3 py-2 text-sm text-gray-300 border-t border-gray-700">${row.label}</th>`;
+        for (let i = 0; i < V.length; i++) {
+          const key = row.seq[i];
+          if (!key || !byR[key]) {
+            mainBody += `
+              <td class="px-3 py-3 border-t border-gray-700 text-gray-600">—</td>
+              <td class="px-2 py-3 border-t border-gray-700 text-center text-xs text-gray-500">—</td>
+              <td class="px-2 py-3 border-t border-gray-700 text-center text-xs text-gray-500">—</td>`;
+            continue;
+          }
+          const k = byR[key];
+          mainBody += `
+            <td class="px-3 py-3 border-t border-gray-700 align-middle">
+              <div class="flex items-baseline gap-3">
+                <div class="text-2xl">${k.h}</div>
+                <div class="text-2xl">${k.k}</div>
+              </div>
+            </td>
+            <td class="px-2 py-3 border-t border-gray-700 text-center text-xs"><code>${k.kbd}</code></td>
+            <td class="px-2 py-3 border-t border-gray-700 text-center text-xs">${k.r !== k.kbd ? `<code>${k.r}</code>` : '—'}</td>`;
+        }
+        mainBody += `</tr>`;
+      }
+      mainBody += `</tbody>`;
+
+      // Yōon block (ya/yu/yo)
+      const YV = ['ya', 'yu', 'yo'];
+      const YOON_ROWS = [
+        { label: 'KY', cat: 'ky', seq: ['kya', 'kyu', 'kyo'] },
+        { label: 'GY', cat: 'gy', seq: ['gya', 'gyu', 'gyo'] },
+        { label: 'SH', cat: 'sh', seq: ['sha', 'shu', 'sho'] },
+        { label: 'CH', cat: 'ch', seq: ['cha', 'chu', 'cho'] },
+        { label: 'J', cat: 'j', seq: ['ja', 'ju', 'jo'] },
+        { label: 'DY', cat: 'dy', seq: ['ja', 'ju', 'jo'] },
+        { label: 'NY', cat: 'ny', seq: ['nya', 'nyu', 'nyo'] },
+        { label: 'HY', cat: 'hy', seq: ['hya', 'hyu', 'hyo'] },
+        { label: 'BY', cat: 'by', seq: ['bya', 'byu', 'byo'] },
+        { label: 'PY', cat: 'py', seq: ['pya', 'pyu', 'pyo'] },
+        { label: 'MY', cat: 'my', seq: ['mya', 'myu', 'myo'] },
+        { label: 'RY', cat: 'ry', seq: ['rya', 'ryu', 'ryo'] },
+      ];
+
+
+      // --- Yōon header (ya/yu/yo grouped) ---
+      const yHead = `
+  <thead>
+    <tr>
+      <th class="px-3 py-2 text-xs font-semibold text-gray-400 border-b border-gray-700 w-14" rowspan="2" scope="col">Yōon</th>
+      ${YV.map(v => `
+        <th class="px-3 py-2 text-xs font-semibold text-gray-400 border-b border-gray-700 uppercase text-center" colspan="3" scope="colgroup">${v}</th>
+      `).join('')}
+    </tr>
+    <tr>
+      ${YV.map(() => `
+        <th class="px-3 py-2 text-xs font-semibold text-gray-400 border-b border-gray-700 text-center" scope="col">Kana</th>
+        <th class="px-2 py-2 text-xs font-semibold text-gray-400 border-b border-gray-700 text-center whitespace-nowrap" scope="col">kbd&nbsp;</th>
+        <th class="px-2 py-2 text-xs font-semibold text-gray-400 border-b border-gray-700 text-center whitespace-nowrap" scope="col">phon</th>
+      `).join('')}
+    </tr>
+  </thead>`;
+
+
+      let yBody = '<tbody>';
+      for (const row of YOON_ROWS) {
+        yBody += `<tr class="hover:bg-gray-800/60">
+          <th class="px-3 py-2 text-sm text-gray-300 border-t border-gray-700">${row.label}</th>`;
+        for (let i = 0; i < YV.length; i++) {
+          const key = row.seq[i];
+          const k = byKey[`${key}|${row.cat}`] || byR[key]; // exact match; fall back just in case
+          if (!k) {
+            yBody += `
+              <td class="px-3 py-3 border-t border-gray-700 text-gray-600">—</td>
+              <td class="px-2 py-3 border-t border-gray-700 text-center text-xs text-gray-500">—</td>
+              <td class="px-2 py-3 border-t border-gray-700 text-center text-xs text-gray-500">—</td>`;
+            continue;
+          }
+          yBody += `
+            <td class="px-3 py-3 border-t border-gray-700 align-middle">
+              <div class="flex items-baseline gap-3">
+                <div class="text-2xl">${k.h}</div>
+                <div class="text-2xl">${k.k}</div>
+              </div>
+            </td>
+            <td class="px-2 py-3 border-t border-gray-700 text-center text-xs"><code>${k.kbd}</code></td>
+            <td class="px-2 py-3 border-t border-gray-700 text-center text-xs">
+              ${k.r !== k.kbd ? `<code>${k.r}</code>` : '—'}
+            </td>`;
+        }
+        yBody += `</tr>`;
+      }
+      yBody += `</tbody>`;
+
+      document.getElementById('kanaTable').innerHTML = `
+        <table class="min-w-full border border-gray-700 rounded-xl overflow-x-auto text-left mb-6">
+          ${mainHead}${mainBody}
+        </table>
+        <h3 class="text-sm text-gray-300 font-semibold mb-2">Yōon (contracted ya/yu/yo)</h3>
+        <table class="min-w-full border border-gray-700 rounded-xl overflow-x-auto text-left">
+          ${yHead}${yBody}
+        </table>
+        <p class="mt-2 text-xs text-gray-500">Tip: IMEs accept multiple spellings. Either <em>kbd</em> (e.g., <code>sya</code>) or <em>phon</em> (e.g., <code>sha</code>) works in typing mode.</p>
+      `;
+    }
+
+    // Keep canvas crisp on resize when visible
     window.addEventListener('resize', () => {
       try {
         const wrap = document.getElementById('drawWrap');
@@ -934,7 +1034,6 @@
         }
       } catch (e) { /* ignore */ }
     });
-
   </script>
 </body>
 
