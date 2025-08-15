@@ -132,7 +132,7 @@
             <span>W row (wa, wo)</span>
           </label>
           <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
-            <input type="checkbox" class="charPool w-4 h-4" value="special" checked />
+            <input type="checkbox" class="charPool w-4 h-4" value="special" />
             <span>Special (n)</span>
           </label>
 
@@ -161,7 +161,7 @@
           <!-- Yōon (aggregate) -->
           <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer sm:col-span-3">
             <input type="checkbox" class="charPool w-4 h-4" value="yoon" checked />
-            <span>Yōon (kya, sha, cha, nya, etc.)</span>
+            <span>Yōon (contracted ゃ/ゅ/ょ: kya, sha, cha, nya, etc.)</span>
           </label>
         </div>
 
@@ -208,12 +208,16 @@
         </div>
 
         <div class="mt-4">
-          <div id="promptHint" class="text-xs text-gray-500 mb-2"></div>
-          <div id="questionPrompt" class="text-3xl font-semibold mb-4">—</div>
-          <div id="feedback" aria-live="polite" class="h-6 text-2xl"></div>
 
+          <!-- Prompt + feedback (centered, with spacing) -->
+          <div class="mb-4">
+            <div id="questionPrompt" class="text-3xl font-semibold text-center transition-opacity duration-500">—</div>
+            <div id="feedback" role="status" aria-live="polite"
+              class="mt-2 h-7 text-2xl text-center transition-opacity duration-500"></div>
+          </div>
+          <div id="promptHint" class="text-xs text-gray-500 text-center"></div>
           <!-- Typing -->
-          <div id="textAnswerWrap" class="mb-4 hidden transition-opacity duration-500">
+          <div id="textAnswerWrap" class="mt-3 mb-4 hidden transition-opacity duration-500">
             <input id="textAnswer" type="text" placeholder="Type your answer and press Enter"
               class="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 focus:outline-none">
             <p class="text-xs text-gray-500">For Romaji: type either IME <code>kbd</code> (e.g., <code>si</code>) or
@@ -221,10 +225,10 @@
           </div>
 
           <!-- Multiple choice -->
-          <div id="mcWrap" class="grid sm:grid-cols-2 gap-2 mb-4 hidden transition-opacity duration-500"></div>
+          <div id="mcWrap" class="mt-3 grid sm:grid-cols-2 gap-2 mb-4 hidden transition-opacity duration-500"></div>
 
           <!-- Drawing -->
-          <div id="drawWrap" class="hidden mb-4 transition-opacity duration-500">
+          <div id="drawWrap" class="mt-3 hidden mb-4 transition-opacity duration-500">
             <canvas id="drawCanvas" class="w-full bg-gray-900 rounded border border-gray-700" height="220"></canvas>
             <div class="flex gap-2">
               <button id="clearCanvas" class="btn btn-secondary">Clear</button>
@@ -268,7 +272,7 @@
       <p class="text-sm text-gray-400 mb-3">
         Gojūon including dakuten (゛), handakuten (゜) and yōon (ゃ/ゅ/ょ). Each vowel column shows <span
           class="font-semibold">Kana</span>, <span class="font-semibold">kbd</span> (IME entry), and <span
-          class="font-semibold">phon</span> (pronunciation).
+          class="font-semibold">phon</span> (pronunciation; only shown if different from <em>kbd</em>).
       </p>
       <div id="kanaTable" class="overflow-x-auto"></div>
 
@@ -474,19 +478,6 @@
     }
     let mcKeyHandler = null;
 
-    function showFeedbackAndAdvance(ok) {
-      if (feedbackEl) {
-        briefFeedback(ok);
-      }
-      // Let the user see the mark briefly, then fade out and advance
-      setTimeout(() => {
-        fadeOutQA(() => {
-          if (feedbackEl) feedbackEl.textContent = '';
-          finishQuestionAndAdvance(); // will call fadeInQA() afterwards
-        });
-      }, 300);
-    }
-
     // ===== Build sets, presets, meta =====
     function buildBaseSet(poolCats) {
       const chosen = new Set(poolCats);
@@ -502,8 +493,6 @@
       return out;
     }
 
-
-
     function selectedQuizMeta(quizType) {
       switch (quizType) {
         case 'kataToRoma': return { from: 'katakana', to: 'romaji' };
@@ -516,6 +505,14 @@
         default: return { from: 'katakana', to: 'romaji' };
       }
     }
+
+    function setFeedbackEmpty() {
+      if (!feedbackEl) return;
+      feedbackEl.innerHTML = '&nbsp;';            // keeps the line’s height
+      feedbackEl.className = `${FEEDBACK_BASE} opacity-0`; // invisible but space reserved
+      feedbackEl.setAttribute('aria-hidden', 'true');
+    }
+
 
     function createQuestions(quizType, poolCats, repetitions, answerMode) {
       const meta = selectedQuizMeta(quizType);
@@ -580,6 +577,8 @@
     };
 
     const questionPromptEl = document.getElementById('questionPrompt');
+    const feedbackEl = document.getElementById('feedback');
+    const FEEDBACK_BASE = 'h-7 text-2xl text-center transition-opacity duration-500';
     const promptHint = document.getElementById('promptHint');
     const textAnswerWrap = document.getElementById('textAnswerWrap');
     const textAnswer = document.getElementById('textAnswer');
@@ -603,10 +602,10 @@
 
     const distractorRow = document.getElementById('distractorRow');
     const distractorSelectedOnly = document.getElementById('distractorSelectedOnly');
-    const feedbackEl = document.getElementById('feedback');
-    const FEEDBACK_BASE = 'h-6 text-2xl';
 
-    const FADE_TARGETS = [questionPromptEl, feedbackEl, textAnswerWrap, mcWrap, drawWrap];
+    const FADE_TARGETS = [questionPromptEl, feedbackEl, promptHint, textAnswerWrap, mcWrap, drawWrap];
+
+
 
     function showScreen(targetId) {
       ['mainMenu', 'quizScreen', 'scoreScreen', 'referenceScreen'].forEach(id => {
@@ -690,6 +689,7 @@
 
       showScreen('quizScreen');
       showQuestion();
+      fadeInQA();
     });
 
     $$('.js-back-menu').forEach(b => b.addEventListener('click', () => showScreen('mainMenu')));
@@ -706,14 +706,15 @@
       questionPromptEl.textContent = q.prompt;
 
       if (q.kind === 'text' && q.meta.to === 'romaji') {
-        promptHint.textContent = 'Type romaji (IME kbd or phonetic), Enter to submit';
+        if (promptHint) promptHint.textContent = 'Type romaji (IME kbd or phonetic), Enter to submit';
       } else if (q.kind === 'mc') {
-        promptHint.textContent = `Pick the correct ${q.meta.to}`;
+        if (promptHint) promptHint.textContent = `Pick the correct ${q.meta.to}`;
       } else if (q.kind === 'draw') {
-        promptHint.textContent = `Draw the ${q.meta.to}`;
+        if (promptHint) promptHint.textContent = `Draw the ${q.meta.to}`;
       } else {
-        promptHint.textContent = '';
+        if (promptHint) promptHint.textContent = '';
       }
+
 
       textAnswerWrap.classList.toggle('hidden', q.kind !== 'text');
       mcWrap.innerHTML = '';
@@ -729,6 +730,7 @@
         initCanvas();
         revealArea.classList.add('hidden');
       }
+      setFeedbackEmpty();
     }
 
     // Typing submit (accept kbd/phon variants)
@@ -814,7 +816,7 @@
         correctGlyph.textContent = q.correct;
       };
       document.getElementById('selfMarkRight').onclick = () => {
-        state.score++; scoreNow.textContent = state.score; showFeedbackAndAdvance(true);;
+        state.score++; scoreNow.textContent = state.score; showFeedbackAndAdvance(true);
       };
       document.getElementById('selfMarkWrong').onclick = () => {
         const q = state.questions[state.index];
@@ -838,8 +840,24 @@
     }
 
     function briefFeedback(ok) {
+      if (!feedbackEl) return;
       feedbackEl.textContent = ok ? '✅' : '❌';
-      feedbackEl.className = `${FEEDBACK_BASE} ${ok ? 'text-green-400' : 'text-red-400'}`;
+      feedbackEl.className = `${FEEDBACK_BASE} ${ok ? 'text-green-400' : 'text-red-400'} opacity-100`;
+      feedbackEl.removeAttribute('aria-hidden');
+    }
+
+
+    function showFeedbackAndAdvance(ok) {
+      if (typeof feedbackEl !== 'undefined' && feedbackEl) {
+        briefFeedback(ok);
+      }
+      setTimeout(() => {
+        fadeOutQA(() => {
+          setFeedbackEmpty();            // was: feedbackEl.textContent = '';
+          finishQuestionAndAdvance();
+        });
+      }, 300);
+
     }
 
     function finishQuestionAndAdvance() {
@@ -862,22 +880,21 @@
 
     document.getElementById('nextQ').addEventListener('click', () => {
       fadeOutQA(() => {
-        if (feedbackEl) feedbackEl.textContent = '';
+        setFeedbackEmpty();            // was: feedbackEl.textContent = '';
         finishQuestionAndAdvance();
       });
     });
 
+
     // ===== Reference Table (same visual style, new content) =====
     function buildKanaTable() {
-      // Keep first occurrence for simple (non-ambiguous) lookups…
+      // Keep first-by-romaji, plus category-aware map to avoid DY overwriting J
       const byR = {};
-      // …and a precise map keyed by r|cat to disambiguate j vs dy, etc.
       const byKey = {};
       for (const k of KANA) {
         if (!byR[k.r]) byR[k.r] = k;            // preserve FIRST seen for that romaji
         byKey[`${k.r}|${k.cat}`] = k;           // exact match for category-specific lookups
       }
-
 
       // Main gojūon header (A/I/U/E/O) — each vowel expands to Kana | kbd | phon
       const V = ['a', 'i', 'u', 'e', 'o'];
@@ -916,7 +933,6 @@
       `).join('')}
     </tr>
   </thead>`;
-
 
       let mainBody = '<tbody>';
       for (const row of GOJUON) {
@@ -963,7 +979,6 @@
         { label: 'RY', cat: 'ry', seq: ['rya', 'ryu', 'ryo'] },
       ];
 
-
       // --- Yōon header (ya/yu/yo grouped) ---
       const yHead = `
   <thead>
@@ -981,7 +996,6 @@
       `).join('')}
     </tr>
   </thead>`;
-
 
       let yBody = '<tbody>';
       for (const row of YOON_ROWS) {
