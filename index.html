@@ -1166,7 +1166,7 @@
         scoreSummary.textContent = `Score: ${state.score}/${state.questions.length}`;
         if (state.wrong.length) {
           wrongAnswers.innerHTML = state.wrong.map(w =>
-            `<div class="text-sm text-gray-300"><span class="text-gray-400">Prompt:</span> ${w.prompt} &nbsp; <span class="text-gray-400">Your answer:</span> ${w.user} &nbsp; <span class="text-gray-400">Correct:</span> ${w.correct}</div>`
+            `<div class="text-lg text-gray-300"><span class="text-gray-400">Prompt:</span> ${w.prompt} &nbsp; <span class="text-gray-400">Your answer:</span> ${w.user} &nbsp; <span class="text-gray-400">Correct:</span> ${w.correct}</div>`
           ).join('');
         } else {
           playFanfare();
