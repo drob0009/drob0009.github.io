@@ -282,6 +282,19 @@
           <button id="nextQ" class="btn btn-ghost">Next</button>
         </div>
       </div>
+
+      <!-- Recent answers -->
+      <div id="recentPanel" class="mt-4">
+        <div class="bg-gray-800 shadow-sm rounded-2xl p-5">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-lg font-semibold">Recent Answers</h3>
+            <span class="text-xs text-gray-500">Last 5</span>
+          </div>
+          <ol id="recentList" class="space-y-2 min-h-[2.5rem]" aria-live="polite" aria-label="Recent answers">
+            <!-- items injected -->
+          </ol>
+        </div>
+      </div>
     </section>
 
     <!-- Score Screen -->
@@ -515,6 +528,14 @@
     }
     let mcKeyHandler = null;
 
+    function escapeHtml(s) {
+      return String(s ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
     // ===== Build sets, presets, meta =====
     function buildBaseSet(poolCats) {
       const chosen = new Set(poolCats);
@@ -644,6 +665,116 @@
     let isFading = false;
     const FADE_MS = 550;
 
+    const recentList = document.getElementById('recentList');
+    const RECENT_MAX = 5;
+    const RECENT_FADE_MS = 550;
+
+    // ===== SFX (Web Audio, no assets) =====
+    let audioCtx = null;
+    let sfxGain = null; // master volume
+
+    function ensureAudio() {
+      if (!audioCtx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AC();
+        sfxGain = audioCtx.createGain();
+        sfxGain.gain.value = 0.22; // tweak volume 0.0–1.0
+        sfxGain.connect(audioCtx.destination);
+      }
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+    }
+
+    function tone({ freq = 440, type = 'sine', start = 0, duration = 0.15, gain = 0.22 }) {
+      ensureAudio();
+      const t0 = audioCtx.currentTime + start;
+      const osc = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+
+      osc.type = type;
+      osc.frequency.value = freq;
+
+      // Simple ADSR-ish envelope
+      g.gain.setValueAtTime(0, t0);
+      g.gain.linearRampToValueAtTime(gain, t0 + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + duration);
+
+      osc.connect(g);
+      g.connect(sfxGain);
+
+      osc.start(t0);
+      osc.stop(t0 + duration + 0.02);
+    }
+
+    function playCorrect() {
+      // Upward two-note chime (E5 → A5)
+      tone({ freq: 659.25, type: 'triangle', duration: 0.12, gain: 0.24 });
+      tone({ freq: 880.00, type: 'triangle', start: 0.10, duration: 0.18, gain: 0.24 });
+    }
+
+    function playWrong() {
+      ensureAudio();
+      const t = audioCtx.currentTime;
+
+      // Base buzz
+      const osc = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(220, t);
+      osc.frequency.exponentialRampToValueAtTime(140, t + 0.25);
+
+      // Quick attack/decay
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(0.22, t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.28);
+
+      // Add a little FM “rasp” with an LFO
+      const lfo = audioCtx.createOscillator();
+      const lfoGain = audioCtx.createGain();
+      lfo.type = 'sine';
+      lfo.frequency.value = 20;      // 20 Hz wobble
+      lfoGain.gain.value = 40;       // depth in Hz
+      lfo.connect(lfoGain);
+      lfoGain.connect(osc.frequency);
+
+      osc.connect(g);
+      g.connect(sfxGain);
+
+      osc.start(t);
+      lfo.start(t);
+      lfo.stop(t + 0.3);
+      osc.stop(t + 0.3);
+    }
+
+    function playFanfare() {
+      // Bright opening chord (C5–E5–G5)
+      tone({ freq: 523.25, type: 'sawtooth', start: 0.00, duration: 0.18, gain: 0.26 }); // C5
+      tone({ freq: 659.25, type: 'sawtooth', start: 0.00, duration: 0.18, gain: 0.24 }); // E5
+      tone({ freq: 783.99, type: 'sawtooth', start: 0.00, duration: 0.18, gain: 0.22 }); // G5
+
+      // A little low "ta-da" body
+      tone({ freq: 196.00, type: 'square', start: 0.02, duration: 0.14, gain: 0.14 }); // G3
+      tone({ freq: 261.63, type: 'square', start: 0.02, duration: 0.14, gain: 0.12 }); // C4
+
+      // Quick ascending run (G5 → A5 → B5 → C6)
+      const step = 0.16;
+      tone({ freq: 783.99, type: 'triangle', start: 0.20, duration: 0.12, gain: 0.22 }); // G5
+      tone({ freq: 880.00, type: 'triangle', start: 0.20 + 1 * step, duration: 0.12, gain: 0.22 }); // A5
+      tone({ freq: 987.77, type: 'triangle', start: 0.20 + 2 * step, duration: 0.12, gain: 0.22 }); // B5
+      tone({ freq: 1046.50, type: 'triangle', start: 0.20 + 3 * step, duration: 0.18, gain: 0.24 }); // C6
+
+      // Sparkly capstone chord (C6–E6–G6)
+      const cap = 0.20 + 3 * step + 0.06;
+      tone({ freq: 1046.50, type: 'triangle', start: cap, duration: 0.18, gain: 0.24 }); // C6
+      tone({ freq: 1318.51, type: 'triangle', start: cap, duration: 0.18, gain: 0.18 }); // E6
+      tone({ freq: 1567.98, type: 'triangle', start: cap, duration: 0.18, gain: 0.14 }); // G6
+    }
+
+
+    function clearRecent() {
+      if (recentList) recentList.innerHTML = '';
+    }
+
     function showScreen(targetId) {
       ['mainMenu', 'quizScreen', 'scoreScreen', 'referenceScreen'].forEach(id => {
         const el = document.getElementById(id);
@@ -651,6 +782,58 @@
         if (id === targetId) el.classList.remove('hidden');
         else el.classList.add('hidden');
       });
+    }
+
+    function fadeRemoveAsync(el, duration = RECENT_FADE_MS) {
+      return new Promise((resolve) => {
+        if (!el) return resolve();
+        el.style.transitionProperty = 'opacity';
+        el.style.transitionDuration = `${duration}ms`;
+        el.classList.remove('opacity-100');
+        el.classList.add('opacity-0');
+        const cleanup = () => {
+          if (el && el.parentNode) el.parentNode.removeChild(el);
+          resolve();
+        };
+        el.addEventListener('transitionend', cleanup, { once: true });
+        setTimeout(cleanup, duration + 50);
+      });
+    }
+
+    function recordRecent({ ok, prompt, user, correct }) {
+      if (!recentList) return;
+
+      // Build item (starts invisible)
+      const li = document.createElement('li');
+      li.className = 'px-3 py-2 rounded-lg border border-gray-700 bg-gray-900/40 ' +
+        'transition-opacity duration-300 opacity-0';
+      li.style.transitionProperty = 'opacity';
+      li.style.transitionDuration = `${RECENT_FADE_MS}ms`;
+      li.innerHTML = `
+    <div class="flex items-center justify-between">
+      <div class="text-xl mr-3">${escapeHtml(prompt)}</div>
+      <div class="${ok ? 'text-green-400' : 'text-red-400'} text-xl">${ok ? '✅' : '❌'}</div>
+    </div>
+    <div class="mt-1 text-xs text-gray-400"><span class="text-gray-500">You:</span> ${escapeHtml(user || '—')}</div>
+    <div class="text-xs text-gray-400"><span class="text-gray-500">Correct:</span> ${escapeHtml(correct || '—')}</div>
+  `;
+      const fadeInNew = () => {
+        recentList.prepend(li);
+        requestAnimationFrame(() => {
+          li.classList.remove('opacity-0');
+          li.classList.add('opacity-100');
+        });
+      };
+
+      // If the list is already full, fade out overflow first, then fade-in the new item
+      // (Keep at most RECENT_MAX-1 existing items before inserting the new one.)
+      const overflow = Array.from(recentList.children).slice(RECENT_MAX - 1);
+      if (overflow.length) {
+        Promise.all(overflow.map(node => fadeRemoveAsync(node, RECENT_FADE_MS)))
+          .then(fadeInNew);
+      } else {
+        fadeInNew();
+      }
     }
 
     // Answer mode availability
@@ -759,6 +942,8 @@
       state.index = 0;
       state.score = 0;
       state.wrong = [];
+      clearRecent();
+
 
       qTotal.textContent = state.questions.length;
       scoreNow.textContent = 0;
@@ -815,11 +1000,10 @@
         const q = state.questions[state.index];
         const user = (textAnswer.value || '').trim().toLowerCase();
         const correct = (q.correct || '').toLowerCase();
-
-        let ok = false;
-        if (q.acceptable instanceof Set) ok = q.acceptable.has(user);
-        else ok = (user === correct);
-
+        const ok = q.acceptable instanceof Set
+          ? q.acceptable.has(user.toLowerCase())
+          : user.toLowerCase() === correct.toLowerCase();
+        recordRecent({ ok, prompt: q.prompt, user, correct })
         if (!ok) {
           state.wrong.push({ prompt: q.prompt, user, correct });
         } else {
@@ -876,6 +1060,7 @@
 
         btn.addEventListener('click', () => {
           const ok = (opt.toString().toLowerCase() === q.correct.toString().toLowerCase());
+          recordRecent({ ok, prompt: q.prompt, user: String(opt), correct: String(q.correct) });
           if (!ok) state.wrong.push({ prompt: q.prompt, user: opt, correct: q.correct });
           else { state.score++; scoreNow.textContent = state.score; }
           showFeedbackAndAdvance(ok);
@@ -921,11 +1106,15 @@
         correctGlyph.textContent = q.correct;
       };
       document.getElementById('selfMarkRight').onclick = () => {
-        state.score++; scoreNow.textContent = state.score; showFeedbackAndAdvance(true);
+        state.score++;
+        scoreNow.textContent = state.score;
+        recordRecent({ ok: true, prompt: q.prompt, user: '[draw]', correct: String(q.correct) });
+        showFeedbackAndAdvance(true);
       };
       document.getElementById('selfMarkWrong').onclick = () => {
         const q = state.questions[state.index];
         state.wrong.push({ prompt: q.prompt, user: '[draw]', correct: q.correct });
+        recordRecent({ ok: false, prompt: q.prompt, user: '[draw]', correct: String(q.correct) });
         showFeedbackAndAdvance(false);
       };
     }
@@ -961,6 +1150,7 @@
 
     function showFeedbackAndAdvance(ok) {
       if (feedbackEl) briefFeedback(ok);
+      (ok ? playCorrect : playWrong)();
       setTimeout(() => {
         fadeOutQA(() => {
           setFeedbackEmpty();
@@ -979,7 +1169,8 @@
             `<div class="text-sm text-gray-300"><span class="text-gray-400">Prompt:</span> ${w.prompt} &nbsp; <span class="text-gray-400">Your answer:</span> ${w.user} &nbsp; <span class="text-gray-400">Correct:</span> ${w.correct}</div>`
           ).join('');
         } else {
-          wrongAnswers.innerHTML = `<div class="text-sm text-emerald-400">Flawless!</div>`;
+          playFanfare();
+          wrongAnswers.innerHTML = `<div class="text-sm text-center text-emerald-400">🎉 Flawless! 💯</div>`;
         }
         return;
       }
