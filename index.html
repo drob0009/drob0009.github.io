@@ -624,9 +624,15 @@
       score: 0,
       wrong: [],
       poolCats: ['vowels', 'k', 's', 't', 'n', 'h', 'm', 'y', 'r', 'w', 'special', 'g', 'z', 'd', 'b', 'p', 'yoon'],
+      active: false,
     };
 
+    let runToken = 0;            // increments each time a quiz starts; used to ignore stale callbacks
+    const pendingTimers = new Set(); // holds timeouts to clear on exit
 
+    function addTimer(id) { pendingTimers.add(id); }
+    function clearAllTimers() { pendingTimers.forEach(clearTimeout); pendingTimers.clear(); }
+    const ensureActive = () => state.active === true;
 
     const questionPromptEl = document.getElementById('questionPrompt');
     const feedbackEl = document.getElementById('feedback');
@@ -684,25 +690,61 @@
       if (audioCtx.state === 'suspended') audioCtx.resume();
     }
 
-    function tone({ freq = 440, type = 'sine', start = 0, duration = 0.15, gain = 0.22 }) {
+    function tone({
+      freq = 440,
+      type = 'sine',
+      start = 0,
+      duration = 0.15,
+      gain = 0.22,
+      // NEW (all optional):
+      sweepTo = null,          // Hz to sweep to (exponential)
+      sweepTime = null,        // seconds from start for the sweep target
+      lfoFreq = null,          // Hz; if set, applies vibrato
+      lfoDepth = null,         // Hz; depth of vibrato
+      attack = 0.02,           // seconds to reach peak gain
+      decay = null             // seconds from start to decay to ~0 (defaults to duration)
+    }) {
       ensureAudio();
       const t0 = audioCtx.currentTime + start;
       const osc = audioCtx.createOscillator();
       const g = audioCtx.createGain();
 
       osc.type = type;
-      osc.frequency.value = freq;
+      osc.frequency.setValueAtTime(freq, t0);
 
-      // Simple ADSR-ish envelope
+      // Optional frequency sweep (exponential glide)
+      if (sweepTo != null && sweepTime != null) {
+        osc.frequency.exponentialRampToValueAtTime(sweepTo, t0 + sweepTime);
+      }
+
+      // Envelope (AD-ish)
+      const d = decay == null ? duration : decay;
       g.gain.setValueAtTime(0, t0);
-      g.gain.linearRampToValueAtTime(gain, t0 + 0.02);
-      g.gain.exponentialRampToValueAtTime(0.0001, t0 + duration);
+      g.gain.linearRampToValueAtTime(gain, t0 + attack);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + d);
+
+      // Optional vibrato LFO
+      let lfo, lfoGain;
+      if (lfoFreq != null && lfoDepth != null) {
+        lfo = audioCtx.createOscillator();
+        lfoGain = audioCtx.createGain();
+        lfo.type = 'sine';
+        lfo.frequency.value = lfoFreq;
+        lfoGain.gain.value = lfoDepth;   // in Hz
+        lfo.connect(lfoGain);
+        lfoGain.connect(osc.frequency);
+      }
 
       osc.connect(g);
       g.connect(sfxGain);
 
       osc.start(t0);
-      osc.stop(t0 + duration + 0.02);
+      if (lfo) lfo.start(t0);
+
+      // Stop everything at the end of the tone's lifespan
+      const tEnd = t0 + Math.max(duration, d);
+      osc.stop(tEnd);
+      if (lfo) lfo.stop(tEnd);
     }
 
     function playCorrect() {
@@ -712,38 +754,32 @@
     }
 
     function playWrong() {
-      ensureAudio();
-      const t = audioCtx.currentTime;
+      // Main buzzy sweep (square): 220 → 140 Hz over 0.25s
+      tone({
+        freq: 220,
+        type: 'square',
+        start: 0.00,
+        duration: 0.30,  // total lifespan
+        gain: 0.22,
+        sweepTo: 140,
+        sweepTime: 0.25,
+        lfoFreq: 20,
+        lfoDepth: 40,
+        attack: 0.02,
+        decay: 0.20      // match original quick decay to near-zero by 0.20s
+      });
 
-      // Base buzz
-      const osc = audioCtx.createOscillator();
-      const g = audioCtx.createGain();
-
-      osc.type = 'square';
-      osc.frequency.setValueAtTime(220, t);
-      osc.frequency.exponentialRampToValueAtTime(140, t + 0.25);
-
-      // Quick attack/decay
-      g.gain.setValueAtTime(0, t);
-      g.gain.linearRampToValueAtTime(0.22, t + 0.02);
-      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.28);
-
-      // Add a little FM “rasp” with an LFO
-      const lfo = audioCtx.createOscillator();
-      const lfoGain = audioCtx.createGain();
-      lfo.type = 'sine';
-      lfo.frequency.value = 20;      // 20 Hz wobble
-      lfoGain.gain.value = 40;       // depth in Hz
-      lfo.connect(lfoGain);
-      lfoGain.connect(osc.frequency);
-
-      osc.connect(g);
-      g.connect(sfxGain);
-
-      osc.start(t);
-      lfo.start(t);
-      lfo.stop(t + 0.3);
-      osc.stop(t + 0.3);
+      // Sub pulse (triangle) for a little “thud”
+      tone({
+        freq: 100,
+        type: 'triangle',
+        start: 0.12,
+        duration: 0.09,
+        gain: 0.18,
+        // no sweep; quick pop
+        attack: 0.01,
+        decay: 0.09
+      });
     }
 
     function playFanfare() {
@@ -796,7 +832,7 @@
           resolve();
         };
         el.addEventListener('transitionend', cleanup, { once: true });
-        setTimeout(cleanup, duration + 50);
+        addTimer(setTimeout(cleanup, duration + 50));
       });
     }
 
@@ -868,6 +904,7 @@
       boxes.forEach(b => { b.checked = set.has(b.value); });
       state.poolCats = values.slice();
     }
+
     function applyPreset(key) {
       const ALL = ['vowels', 'k', 's', 't', 'n', 'h', 'm', 'y', 'r', 'w', 'special', 'g', 'z', 'd', 'b', 'p', 'yoon'];
       switch (key) {
@@ -882,6 +919,7 @@
       }
       updateQuestionLimit(true);
     }
+
     document.addEventListener('click', (e) => {
       const btn = e.target.closest('[data-preset]');
       if (!btn) return;
@@ -904,6 +942,7 @@
     function computePoolSize() {
       return buildBaseSet(state.poolCats.slice()).length;
     }
+
     function computeMaxQuestions() {
       const quizType = (document.querySelector('input[name="quizType"]:checked') || {}).value || 'kataToRoma';
       const reps = Math.max(1, parseInt(repsEl.value || '1', 10));
@@ -911,6 +950,7 @@
       const factor = (selectedQuizMeta(quizType).from === 'mixedKana') ? 2 : 1;
       return baseSize * factor * reps;
     }
+
     function updateQuestionLimit(setValueToMax) {
       const max = computeMaxQuestions();
       maxQEl.textContent = max;
@@ -931,6 +971,8 @@
 
     // Start / Back / Reference
     document.getElementById('startQuiz').addEventListener('click', () => {
+      runToken++;
+
       const quizType = (document.querySelector('input[name="quizType"]:checked') || {}).value || 'kataToRoma';
       const answerMode = (document.querySelector('input[name="answerMode"]:checked') || {}).value || 'mc';
       const reps = Math.max(1, parseInt(repsEl.value || '1', 10));
@@ -942,8 +984,8 @@
       state.index = 0;
       state.score = 0;
       state.wrong = [];
+      state.active = true;
       clearRecent();
-
 
       qTotal.textContent = state.questions.length;
       scoreNow.textContent = 0;
@@ -953,7 +995,17 @@
       fadeInQA();
     });
 
-    $$('.js-back-menu').forEach(b => b.addEventListener('click', () => showScreen('mainMenu')));
+    $$('.js-back-menu').forEach(b => b.addEventListener('click', () => {
+      state.active = false;
+      textAnswer.value = '';
+      textAnswer.blur();
+      textAnswerWrap.classList.add('hidden');
+      mcWrap.classList.add('hidden');
+      drawWrap.classList.add('hidden');
+      clearAllTimers();
+      showScreen('mainMenu');
+    }
+    ));
 
     document.getElementById('openReference').addEventListener('click', () => {
       showScreen('referenceScreen');
@@ -996,27 +1048,16 @@
 
     // Typing submit (accept kbd/phon variants)
     document.addEventListener('keydown', (e) => {
+      if (!state.active) return;
       if (e.key === 'Enter' && !textAnswerWrap.classList.contains('hidden')) {
-        const q = state.questions[state.index];
-        const user = (textAnswer.value || '').trim().toLowerCase();
-        const correct = (q.correct || '').toLowerCase();
-        const ok = q.acceptable instanceof Set
-          ? q.acceptable.has(user.toLowerCase())
-          : user.toLowerCase() === correct.toLowerCase();
-        recordRecent({ ok, prompt: q.prompt, user, correct })
-        if (!ok) {
-          state.wrong.push({ prompt: q.prompt, user, correct });
-        } else {
-          state.score++;
-          scoreNow.textContent = state.score;
-        }
-        showFeedbackAndAdvance(ok);
+        e.preventDefault();
+        submitTypingAnswer();
       }
     });
 
     // Number key shortcuts for MC: 1–4
     document.addEventListener('keydown', (e) => {
-      if (mcWrap.classList.contains('hidden') || isFading) return;
+      if (!state.active || mcWrap.classList.contains('hidden') || isFading) return;
       const key = e.key;
       if (key === '1' || key === '2' || key === '3' || key === '4') {
         const idx = parseInt(key, 10) - 1;
@@ -1059,11 +1100,11 @@
         btn.appendChild(label);
 
         btn.addEventListener('click', () => {
-          const ok = (opt.toString().toLowerCase() === q.correct.toString().toLowerCase());
-          recordRecent({ ok, prompt: q.prompt, user: String(opt), correct: String(q.correct) });
-          if (!ok) state.wrong.push({ prompt: q.prompt, user: opt, correct: q.correct });
-          else { state.score++; scoreNow.textContent = state.score; }
-          showFeedbackAndAdvance(ok);
+          if (!state.active) return;
+          const qNow = state.questions[state.index];
+          const chosen = String(opt);
+          const ok = (chosen.toLowerCase() === String(qNow.correct).toLowerCase());
+          postSubmit({ q: qNow, user: chosen, ok });
         });
 
         mcWrap.appendChild(btn);
@@ -1106,24 +1147,23 @@
         correctGlyph.textContent = q.correct;
       };
       document.getElementById('selfMarkRight').onclick = () => {
-        state.score++;
-        scoreNow.textContent = state.score;
-        recordRecent({ ok: true, prompt: q.prompt, user: '[draw]', correct: String(q.correct) });
-        showFeedbackAndAdvance(true);
+        if (!state.active) return;
+        const q = state.questions[state.index];
+        postSubmit({ q, user: '[draw]', ok: true });
       };
       document.getElementById('selfMarkWrong').onclick = () => {
+        if (!state.active) return;
         const q = state.questions[state.index];
-        state.wrong.push({ prompt: q.prompt, user: '[draw]', correct: q.correct });
-        recordRecent({ ok: false, prompt: q.prompt, user: '[draw]', correct: String(q.correct) });
-        showFeedbackAndAdvance(false);
+        postSubmit({ q, user: '[draw]', ok: false });
       };
     }
 
     // Fade + feedback
     function fadeOutQA(cb) {
       isFading = true;
+      const myToken = runToken;
       FADE_TARGETS.forEach(el => { if (el && !el.classList.contains('hidden')) el.style.opacity = '0'; });
-      setTimeout(cb, FADE_MS);
+      addTimer(setTimeout(() => { if (state.active && myToken === runToken) cb?.(); }, FADE_MS));
     }
 
     function fadeInQA() {
@@ -1131,7 +1171,7 @@
       requestAnimationFrame(() => {
         FADE_TARGETS.forEach(el => { if (el && !el.classList.contains('hidden')) el.style.opacity = '1'; });
       });
-      setTimeout(() => { isFading = false; }, FADE_MS);
+      addTimer(setTimeout(() => { isFading = false; }, FADE_MS));
     }
 
     function setFeedbackEmpty() {
@@ -1148,15 +1188,48 @@
       feedbackEl.removeAttribute('aria-hidden');
     }
 
+    function submitTypingAnswer() {
+      if (!state.active || textAnswerWrap.classList.contains('hidden') || isFading) return;
+      const q = state.questions[state.index];
+      const userRaw = (textAnswer.value || '').trim();
+      const user = userRaw.toLowerCase();
+      const correct = (q.correct || '').toString();
+      const ok = q.acceptable instanceof Set
+        ? q.acceptable.has(user)
+        : user === correct.toLowerCase();
+      textAnswer.value = '';
+      textAnswer.focus();
+      postSubmit({ q, user: userRaw, ok });
+    }
+
+    function postSubmit({ q, user, ok }) {
+      const correctStr = String(q.correct);
+      const userStr = String(user);
+
+      // Record to recent
+      recordRecent({ ok, prompt: q.prompt, user: userStr, correct: correctStr });
+
+      // Score / wrong list
+      if (ok) {
+        state.score++;
+        scoreNow.textContent = state.score;
+      } else {
+        state.wrong.push({ prompt: q.prompt, user: userStr, correct: correctStr });
+      }
+
+      // Feedback (plays audio) and advance
+      showFeedbackAndAdvance(ok);
+    }
+
     function showFeedbackAndAdvance(ok) {
       if (feedbackEl) briefFeedback(ok);
       (ok ? playCorrect : playWrong)();
-      setTimeout(() => {
+      addTimer(setTimeout(() => {
         fadeOutQA(() => {
           setFeedbackEmpty();
           finishQuestionAndAdvance();
         });
-      }, 300);
+      }, 300));
     }
 
     function finishQuestionAndAdvance() {
@@ -1179,7 +1252,14 @@
     }
 
     document.getElementById('nextQ').addEventListener('click', () => {
+      if (!state.active) return;
+      // If we're in Typing mode, Next should behave like pressing Enter.
+      if (!textAnswerWrap.classList.contains('hidden')) {
+        submitTypingAnswer();
+        return;
+      }// MC or Draw: keep your current quick-advance behavior.
       fadeOutQA(() => {
+        if (!state.active) return;
         setFeedbackEmpty();
         finishQuestionAndAdvance();
       });

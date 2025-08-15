@@ -561,6 +561,9 @@
     --tw-duration: 500ms;
     transition-duration: 500ms;
   }
+  .\[draw\:skip\] {
+    draw: skip;
+  }
   .hover\:bg-gray-800\/60 {
     &:hover {
       @media (hover: hover) {
