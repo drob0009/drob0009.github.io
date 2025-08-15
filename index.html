@@ -183,13 +183,22 @@
         </div>
       </div>
 
-      <!-- Repetitions -->
+      <!-- Repetitions + Question Count -->
       <div class="bg-gray-800 shadow-sm rounded-2xl p-5">
         <h2 class="text-xl font-semibold mb-3">Repetitions</h2>
         <div class="flex items-center gap-3">
           <input type="number" id="repetitions" min="1" value="1"
             class="w-28 p-2 border border-gray-700 rounded bg-gray-900 text-gray-100" />
-          <span class="text-sm text-gray-400">Each picked character appears this many times.</span>
+          <span class="text-sm text-gray-400">Each picked character may appears this number of times.</span>
+        </div>
+
+        <div class="mt-4">
+          <h3 class="text-base font-semibold mb-2">Questions</h3>
+          <div class="flex items-center gap-3">
+            <input type="number" id="questionCount" min="0" value="0"
+              class="w-28 p-2 border border-gray-700 rounded bg-gray-900 text-gray-100" />
+            <span class="text-sm text-gray-400">How many questions to ask (max <span id="maxQuestions">0</span>).</span>
+          </div>
         </div>
       </div>
 
@@ -215,7 +224,10 @@
             <div id="feedback" role="status" aria-live="polite"
               class="mt-2 h-7 text-2xl text-center transition-opacity duration-500"></div>
           </div>
+
+          <!-- Hint under prompt -->
           <div id="promptHint" class="text-xs text-gray-500 text-center"></div>
+
           <!-- Typing -->
           <div id="textAnswerWrap" class="mt-3 mb-4 hidden transition-opacity duration-500">
             <input id="textAnswer" type="text" placeholder="Type your answer and press Enter"
@@ -506,14 +518,6 @@
       }
     }
 
-    function setFeedbackEmpty() {
-      if (!feedbackEl) return;
-      feedbackEl.innerHTML = '&nbsp;';            // keeps the line’s height
-      feedbackEl.className = `${FEEDBACK_BASE} opacity-0`; // invisible but space reserved
-      feedbackEl.setAttribute('aria-hidden', 'true');
-    }
-
-
     function createQuestions(quizType, poolCats, repetitions, answerMode) {
       const meta = selectedQuizMeta(quizType);
       const base = buildBaseSet(poolCats);
@@ -590,6 +594,11 @@
     const revealArea = document.getElementById('revealArea');
     const correctGlyph = document.getElementById('correctGlyph');
 
+    const repsEl = document.getElementById('repetitions');
+    const qCountEl = document.getElementById('questionCount');
+    const maxQEl = document.getElementById('maxQuestions');
+    const startQuizBtn = document.getElementById('startQuiz');
+
     const scoreNow = document.getElementById('scoreNow');
     const scoreSummary = document.getElementById('scoreSummary');
     const wrongAnswers = document.getElementById('wrongAnswers');
@@ -604,8 +613,6 @@
     const distractorSelectedOnly = document.getElementById('distractorSelectedOnly');
 
     const FADE_TARGETS = [questionPromptEl, feedbackEl, promptHint, textAnswerWrap, mcWrap, drawWrap];
-
-
 
     function showScreen(targetId) {
       ['mainMenu', 'quizScreen', 'scoreScreen', 'referenceScreen'].forEach(id => {
@@ -632,13 +639,14 @@
       document.getElementById('modeDrawLabel').classList.toggle('opacity-50', !drawOK);
       distractorRow.classList.toggle('hidden', !(meta.to !== 'romaji' && modeMC.checked));
       document.getElementById('distractorLabel').classList.toggle('opacity-50', !(meta.to !== 'romaji' && modeMC.checked));
+      updateQuestionLimit(true);
     }
 
     $$('.grid input[name="quizType"]').forEach(r => r.addEventListener('change', updateAnswerModeAvailability));
     $$('input[name="answerMode"]').forEach(r => r.addEventListener('change', updateAnswerModeAvailability));
     updateAnswerModeAvailability();
 
-    // Presets (added dakuten/handakuten + yoon aggregate)
+    // Presets
     function setPools(values) {
       const boxes = $$('.charPool');
       const set = new Set(values);
@@ -654,6 +662,7 @@
         case 'all': setPools(ALL); break;
         case 'clear': setPools([]); break;
       }
+      updateQuestionLimit(true);
     }
     document.addEventListener('click', (e) => {
       const btn = e.target.closest('[data-preset]');
@@ -669,17 +678,57 @@
         } else {
           state.poolCats = state.poolCats.filter(v => v !== cb.value);
         }
+        updateQuestionLimit(true); // set to new max whenever pools change
       });
     });
+
+    // ===== Question-limit logic =====
+    function computePoolSize() {
+      return buildBaseSet(state.poolCats.slice()).length;
+    }
+
+    function updateQuestionLimit(setValueToMax) {
+      const max = computeMaxQuestions();
+      maxQEl.textContent = max;
+      qCountEl.max = String(max);
+
+      if (setValueToMax) {
+        qCountEl.value = String(max);           // snap to new max on pool/reps/quiz change
+      } else {
+        const cur = Math.max(0, parseInt(qCountEl.value || '0', 10));
+        if (cur > max) qCountEl.value = String(max);
+      }
+
+      startQuizBtn.disabled = (max === 0);
+      startQuizBtn.setAttribute('aria-disabled', String(max === 0));
+    }
+
+    function computeMaxQuestions() {
+      const quizType = (document.querySelector('input[name="quizType"]:checked') || {}).value || 'kataToRoma';
+      const reps = Math.max(1, parseInt(repsEl.value || '1', 10));
+      const baseSize = computePoolSize(); // number of unique characters from current pools
+
+      // Mixed Kana asks each selected character twice (one ひ + one カ)
+      const factor = (selectedQuizMeta(quizType).from === 'mixedKana') ? 2 : 1;
+
+      return baseSize * factor * reps;
+    }
+
+
+    // Reps and manual questionCount adjustments
+    repsEl.addEventListener('input', () => updateQuestionLimit(true)); // keep synced to max
+    qCountEl.addEventListener('input', () => updateQuestionLimit(false)); // clamp if needed
 
     // Start / Back / Reference
     document.getElementById('startQuiz').addEventListener('click', () => {
       const quizType = (document.querySelector('input[name="quizType"]:checked') || {}).value || 'kataToRoma';
       const answerMode = (document.querySelector('input[name="answerMode"]:checked') || {}).value || 'mc';
-      const reps = Math.max(1, parseInt(document.getElementById('repetitions').value || '1', 10));
+      const reps = Math.max(1, parseInt(repsEl.value || '1', 10));
+      const desired = Math.max(0, parseInt(qCountEl.value || '0', 10));
 
       const poolList = state.poolCats.slice();
-      state.questions = createQuestions(quizType, poolList, reps, answerMode);
+      const allQ = createQuestions(quizType, poolList, reps, answerMode);
+      state.questions = (desired > 0) ? allQ.slice(0, Math.min(desired, allQ.length)) : allQ;
       state.index = 0;
       state.score = 0;
       state.wrong = [];
@@ -715,7 +764,6 @@
         if (promptHint) promptHint.textContent = '';
       }
 
-
       textAnswerWrap.classList.toggle('hidden', q.kind !== 'text');
       mcWrap.innerHTML = '';
       mcWrap.classList.toggle('hidden', q.kind !== 'mc');
@@ -730,7 +778,8 @@
         initCanvas();
         revealArea.classList.add('hidden');
       }
-      setFeedbackEmpty();
+
+      setFeedbackEmpty(); // reserve space, invisible
     }
 
     // Typing submit (accept kbd/phon variants)
@@ -767,7 +816,7 @@
         q.meta.to === 'romaji' ? d.r : (q.meta.to === 'hiragana' ? d.h : d.k)
       )];
 
-      shuffle(options).forEach((opt, i) => {
+      shuffle(options).forEach((opt) => {
         const btn = document.createElement('button');
         btn.className = 'btn btn-secondary';
         btn.textContent = opt;
@@ -781,7 +830,7 @@
       });
     }
 
-    // Drawing mode (unchanged styles)
+    // Drawing mode
     let ctx, drawing = false, last = null;
     function initCanvas() {
       const ratio = window.devicePixelRatio || 1;
@@ -825,18 +874,24 @@
       };
     }
 
+    // Fade + feedback
     function fadeOutQA(cb) {
-      // Fade prompt + feedback + whichever answer block is visible
       FADE_TARGETS.forEach(el => { if (el && !el.classList.contains('hidden')) el.style.opacity = '0'; });
-      setTimeout(cb, 550); // match .duration-500
+      setTimeout(cb, 550);
     }
 
     function fadeInQA() {
-      // Start invisible (so new content fades in)
       FADE_TARGETS.forEach(el => { if (el && !el.classList.contains('hidden')) el.style.opacity = '0'; });
       requestAnimationFrame(() => {
         FADE_TARGETS.forEach(el => { if (el && !el.classList.contains('hidden')) el.style.opacity = '1'; });
       });
+    }
+
+    function setFeedbackEmpty() {
+      if (!feedbackEl) return;
+      feedbackEl.innerHTML = '&nbsp;';
+      feedbackEl.className = `${FEEDBACK_BASE} opacity-0`;
+      feedbackEl.setAttribute('aria-hidden', 'true');
     }
 
     function briefFeedback(ok) {
@@ -846,18 +901,14 @@
       feedbackEl.removeAttribute('aria-hidden');
     }
 
-
     function showFeedbackAndAdvance(ok) {
-      if (typeof feedbackEl !== 'undefined' && feedbackEl) {
-        briefFeedback(ok);
-      }
+      if (feedbackEl) briefFeedback(ok);
       setTimeout(() => {
         fadeOutQA(() => {
-          setFeedbackEmpty();            // was: feedbackEl.textContent = '';
+          setFeedbackEmpty();
           finishQuestionAndAdvance();
         });
       }, 300);
-
     }
 
     function finishQuestionAndAdvance() {
@@ -880,23 +931,20 @@
 
     document.getElementById('nextQ').addEventListener('click', () => {
       fadeOutQA(() => {
-        setFeedbackEmpty();            // was: feedbackEl.textContent = '';
+        setFeedbackEmpty();
         finishQuestionAndAdvance();
       });
     });
 
-
-    // ===== Reference Table (same visual style, new content) =====
+    // ===== Reference Table =====
     function buildKanaTable() {
-      // Keep first-by-romaji, plus category-aware map to avoid DY overwriting J
       const byR = {};
       const byKey = {};
       for (const k of KANA) {
-        if (!byR[k.r]) byR[k.r] = k;            // preserve FIRST seen for that romaji
-        byKey[`${k.r}|${k.cat}`] = k;           // exact match for category-specific lookups
+        if (!byR[k.r]) byR[k.r] = k;
+        byKey[`${k.r}|${k.cat}`] = k;
       }
 
-      // Main gojūon header (A/I/U/E/O) — each vowel expands to Kana | kbd | phon
       const V = ['a', 'i', 'u', 'e', 'o'];
       const GOJUON = [
         { label: '—', seq: ['a', 'i', 'u', 'e', 'o'] },
@@ -916,7 +964,7 @@
         { label: 'P', seq: ['pa', 'pi', 'pu', 'pe', 'po'] },
       ];
 
-      // --- Main table header (A/I/U/E/O grouped) ---
+      // Grouped header
       const mainHead = `
   <thead>
     <tr>
@@ -962,7 +1010,7 @@
       }
       mainBody += `</tbody>`;
 
-      // Yōon block (ya/yu/yo)
+      // Yōon
       const YV = ['ya', 'yu', 'yo'];
       const YOON_ROWS = [
         { label: 'KY', cat: 'ky', seq: ['kya', 'kyu', 'kyo'] },
@@ -979,7 +1027,6 @@
         { label: 'RY', cat: 'ry', seq: ['rya', 'ryu', 'ryo'] },
       ];
 
-      // --- Yōon header (ya/yu/yo grouped) ---
       const yHead = `
   <thead>
     <tr>
@@ -1003,7 +1050,7 @@
           <th class="px-3 py-2 text-sm text-gray-300 border-t border-gray-700">${row.label}</th>`;
         for (let i = 0; i < YV.length; i++) {
           const key = row.seq[i];
-          const k = byKey[`${key}|${row.cat}`] || byR[key]; // exact match; fall back just in case
+          const k = byKey[`${key}|${row.cat}`] || byR[key];
           if (!k) {
             yBody += `
               <td class="px-3 py-3 border-t border-gray-700 text-gray-600">—</td>
@@ -1048,6 +1095,9 @@
         }
       } catch (e) { /* ignore */ }
     });
+
+    // Initialize question max on first load
+    updateQuestionLimit(true);
   </script>
 </body>
 
