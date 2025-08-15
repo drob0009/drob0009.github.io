@@ -838,8 +838,8 @@
             ${state.wrong.map(w => `
               <div class="py-2 flex items-center justify-between gap-3">
                 <span class="text-xl">${w.prompt}</span>
-                <span class="text-sm text-gray-400">Your answer: <span class="badge bg-gray-700 text-gray-100">${escapeHTML(String(w.user))}</span></span>
                 <span class="text-sm">Correct: <span class="badge bg-blue-900 text-blue-100">${w.correct}</span></span>
+                <span class="text-sm text-gray-400">Your answer: <span class="badge bg-gray-700 text-gray-100">${escapeHTML(String(w.user))}</span></span>
               </div>
             `).join('')}
           </div>
@@ -909,33 +909,33 @@
       kanaTable.innerHTML = html;
     }
 
-  
-// Added by patch: make Kana Chart button work
-let kanaBuilt = false;
-if (typeof openReference !== 'undefined' && openReference) {
-  openReference.addEventListener('click', () => {
-    try {
-      if (!kanaBuilt && typeof buildKanaTable === 'function') { buildKanaTable(); kanaBuilt = true; }
-    } catch (e) { console.error('Error building kana table:', e); }
-    mainMenu.classList.add('hidden');
-    quizScreen.classList.add('hidden');
-    scoreScreen.classList.add('hidden');
-    referenceScreen.classList.remove('hidden');
-  });
-}
 
-
-// Added by patch: keep canvas crisp on resize when draw mode visible
-window.addEventListener('resize', () => {
-  try {
-    const wrap = document.getElementById('drawWrap');
-    if (wrap && !wrap.classList.contains('hidden') && typeof initCanvas === 'function') {
-      initCanvas();
+    // Added by patch: make Kana Chart button work
+    let kanaBuilt = false;
+    if (typeof openReference !== 'undefined' && openReference) {
+      openReference.addEventListener('click', () => {
+        try {
+          if (!kanaBuilt && typeof buildKanaTable === 'function') { buildKanaTable(); kanaBuilt = true; }
+        } catch (e) { console.error('Error building kana table:', e); }
+        mainMenu.classList.add('hidden');
+        quizScreen.classList.add('hidden');
+        scoreScreen.classList.add('hidden');
+        referenceScreen.classList.remove('hidden');
+      });
     }
-  } catch (e) { /* ignore */ }
-});
 
-</script>
+
+    // Added by patch: keep canvas crisp on resize when draw mode visible
+    window.addEventListener('resize', () => {
+      try {
+        const wrap = document.getElementById('drawWrap');
+        if (wrap && !wrap.classList.contains('hidden') && typeof initCanvas === 'function') {
+          initCanvas();
+        }
+      } catch (e) { /* ignore */ }
+    });
+
+  </script>
 </body>
 
 </html>
