@@ -5,7 +5,7 @@
 }
 
 .btn {
-  @apply inline-flex items-center justify-center rounded-xl font-semibold px-5 py-2 transition ml-1 mr-3 my-0.5 ;
+  @apply inline-flex items-center justify-center rounded-xl font-semibold px-5 py-2 transition;
 }
 
 /* Strong call to action */
