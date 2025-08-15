@@ -139,7 +139,7 @@
             <span>W row (wa, wo)</span>
           </label>
           <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
-            <input type="checkbox" class="charPool w-4 h-4" value="special" checked/>
+            <input type="checkbox" class="charPool w-4 h-4" value="special" checked />
             <span>Special (n)</span>
           </label>
 
@@ -175,7 +175,9 @@
 
         <!-- Presets -->
         <h3 class="text-sm font-semibold mb-2 text-gray-300">Presets</h3>
-
+        <p class="text-xs text-gray-500 mt-2">
+          Presets adjust the checkbox selection above. You can tweak further after applying.
+        </p>
         <!-- Buttons grid -->
 
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -198,11 +200,10 @@
           <button type="button" class="btn btn-secondary text-sm px-3 py-1.5 sm:col-start-2 sm:row-start-3"
             data-preset="clear">Clear all</button>
         </div>
+
       </div>
 
-      <p class="text-xs text-gray-500 mt-2">
-        Presets adjust the checkbox selection above. You can tweak further after applying.
-      </p>
+
 
 
       <!-- Repetitions + Question Count -->
@@ -295,31 +296,33 @@
       </div>
     </section>
   </div>
+  <div class="max-w-5xl mx-auto p-6">
+    <!-- Reference Screen -->
+    <section id="referenceScreen" class="hidden">
+      <div class="bg-gray-800 shadow-sm rounded-2xl p-5">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-2xl font-bold">Kana Chart</h2>
+          <button class="btn btn-ghost js-back-menu">Back to Menu</button>
+        </div>
+        <p class="text-sm text-gray-400 mb-3">
+          Gojūon including dakuten (゛), handakuten (゜) and yōon (ゃ/ゅ/ょ). Each vowel column shows <span
+            class="font-semibold">Kana</span>, <span class="font-semibold">kbd</span> (IME entry), and <span
+            class="font-semibold">phon</span> (pronunciation; only shown if different from <em>kbd</em>).
+        </p>
+        <div id="kanaTable" class="overflow-x-auto"></div>
 
-  <!-- Reference Screen -->
-  <section id="referenceScreen" class="hidden">
-    <div class="bg-gray-800 shadow-sm rounded-2xl p-5">
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-2xl font-bold">Kana Chart</h2>
-        <button class="btn btn-ghost js-back-menu">Back to Menu</button>
-      </div>
-      <p class="text-sm text-gray-400 mb-3">
-        Gojūon including dakuten (゛), handakuten (゜) and yōon (ゃ/ゅ/ょ). Each vowel column shows <span
-          class="font-semibold">Kana</span>, <span class="font-semibold">kbd</span> (IME entry), and <span
-          class="font-semibold">phon</span> (pronunciation; only shown if different from <em>kbd</em>).
-      </p>
-      <div id="kanaTable" class="overflow-x-auto"></div>
-
-      <div class="mt-4">
-        <div class="inline-flex items-center gap-2 border border-gray-700 rounded-xl px-3 py-2">
-          <span class="text-sm text-gray-300">Special:</span>
-          <span class="text-xl">ん</span>
-          <span class="text-xl">/</span>
-          <span class="text-xl">ン</span>
+        <div class="mt-4">
+          <div class="inline-flex items-center gap-2 border border-gray-700 rounded-xl px-3 py-2">
+            <span class="text-sm text-gray-300">Special:</span>
+            <span class="text-xl">ん</span>
+            <span class="text-xl">/</span>
+            <span class="text-xl">ン</span>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
+  </div>
+
 
   <script>
     // ===== Data =====
