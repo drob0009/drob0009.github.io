@@ -252,7 +252,7 @@
           <div id="promptHint" class="text-xs text-gray-500 text-center"></div>
 
           <!-- Typing -->
-          <div id="textAnswerWrap" class="mt-3 mb-4 hidden transition-opacity duration-500">
+          <div id="textAnswerWrap" class="mt-3 mb-4 hidden">
             <input id="textAnswer" type="text" placeholder="Type your answer and press Enter"
               class="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 focus:outline-none">
             <p class="text-xs text-gray-500">For Romaji: type either IME <code>kbd</code> (e.g., <code>si</code>) or
@@ -667,7 +667,9 @@
     const distractorRow = document.getElementById('distractorRow');
     const distractorSelectedOnly = document.getElementById('distractorSelectedOnly');
 
-    const FADE_TARGETS = [questionPromptEl, feedbackEl, promptHint, textAnswerWrap, mcWrap, drawWrap];
+    // const FADE_TARGETS = [questionPromptEl, feedbackEl, promptHint, textAnswerWrap, mcWrap, drawWrap];
+
+
     let isFading = false;
     const FADE_MS = 550;
 
@@ -805,7 +807,6 @@
       tone({ freq: 1318.51, type: 'triangle', start: cap, duration: 0.18, gain: 0.18 }); // E6
       tone({ freq: 1567.98, type: 'triangle', start: cap, duration: 0.18, gain: 0.14 }); // G6
     }
-
 
     function clearRecent() {
       if (recentList) recentList.innerHTML = '';
@@ -1043,6 +1044,8 @@
         revealArea.classList.add('hidden');
       }
 
+      if (textAnswerWrap) textAnswerWrap.style.opacity = '';
+      if (promptHint) promptHint.style.opacity = '';
       setFeedbackEmpty(); // reserve space, invisible
     }
 
@@ -1111,7 +1114,6 @@
       });
     }
 
-
     // Drawing mode
     let ctx, drawing = false, last = null;
     function initCanvas() {
@@ -1159,17 +1161,32 @@
     }
 
     // Fade + feedback
+    function getFadeTargets() {
+      // Always fade the prompt + feedback
+      const targets = [questionPromptEl, feedbackEl];
+
+      // Fade the active mode container (MC/Draw); keep typing UI visible & steady
+      const q = state.questions[state.index];
+      if (q && q.kind === 'mc') targets.push(mcWrap);
+      if (q && q.kind === 'draw') targets.push(drawWrap);
+
+      // Do NOT include textAnswerWrap or promptHint so they never fade
+      return targets.filter(Boolean).filter(el => !el.classList.contains('hidden'));
+    }
+
     function fadeOutQA(cb) {
       isFading = true;
       const myToken = runToken;
-      FADE_TARGETS.forEach(el => { if (el && !el.classList.contains('hidden')) el.style.opacity = '0'; });
+      const targets = getFadeTargets();
+      targets.forEach(el => { el.style.opacity = '0'; });
       addTimer(setTimeout(() => { if (state.active && myToken === runToken) cb?.(); }, FADE_MS));
     }
 
     function fadeInQA() {
-      FADE_TARGETS.forEach(el => { if (el && !el.classList.contains('hidden')) el.style.opacity = '0'; });
+      const targets = getFadeTargets();
+      targets.forEach(el => { el.style.opacity = '0'; });
       requestAnimationFrame(() => {
-        FADE_TARGETS.forEach(el => { if (el && !el.classList.contains('hidden')) el.style.opacity = '1'; });
+        targets.forEach(el => { el.style.opacity = '1'; });
       });
       addTimer(setTimeout(() => { isFading = false; }, FADE_MS));
     }
