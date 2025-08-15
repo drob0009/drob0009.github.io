@@ -5,36 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Kana Quiz</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    #drawCanvas {
-      touch-action: none;
-    }
-
-    .btn {
-      @apply px-4 py-2 rounded font-medium transition;
-    }
-
-    .btn-primary {
-      @apply bg-blue-500 text-white hover:bg-blue-600;
-    }
-
-    .btn-secondary {
-      @apply bg-gray-700 text-gray-100 hover:bg-gray-600;
-    }
-
-    .btn-danger {
-      @apply bg-red-600 text-white hover:bg-red-700;
-    }
-
-    .badge {
-      @apply rounded px-2 py-0.5 text-xs font-semibold;
-    }
-
-    .disabled {
-      @apply opacity-50 pointer-events-none;
-    }
-  </style>
+  <link href="./output.css" rel="stylesheet">
 </head>
 
 <body class="bg-gray-900 text-gray-100 min-h-screen">
@@ -197,9 +168,9 @@
         </div>
       </div>
 
-      <div class="flex justify-end">
-        <button id="openReference" class="btn btn-secondary w-full sm:w-auto">Kana Chart</button>
-        <button id="startQuiz" class="btn btn-primary w-full sm:w-auto">Start Quiz</button>
+      <div class="flex items-center justify-between gap-3">
+        <button id="openReference" class="btn btn-secondary">Kana Chart</button>
+        <button id="startQuiz" class="btn btn-primary">Start Quiz</button>
       </div>
     </section>
 
@@ -254,7 +225,7 @@
         <p id="scoreSummary" class="text-lg mb-4"></p>
         <div id="wrongAnswers" class="space-y-2 mb-6"></div>
         <div class="flex justify-end">
-          <button id="backToMenu" class="btn btn-primary">Back to Menu</button>
+          <button class="btn btn-ghost js-back-menu">Back to Menu</button>
         </div>
       </div>
     </section>
@@ -263,7 +234,7 @@
     <div class="bg-gray-800 shadow-sm rounded-2xl p-5">
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-2xl font-bold">Kana Chart</h2>
-        <button id="backFromRef" class="btn btn-secondary">Back to Menu</button>
+        <button class="btn btn-ghost js-back-menu">Back to Menu</button>
       </div>
 
       <p class="text-sm text-gray-400 mb-3">
@@ -442,11 +413,9 @@
     const questionPromptEl = $('#questionPrompt');
     const scoreSummary = $('#scoreSummary');
     const wrongAnswersDiv = $('#wrongAnswers');
-    const backToMenu = $('#backToMenu');
 
     const referenceScreen = document.getElementById('referenceScreen');
     const openReference = document.getElementById('openReference');
-    const backFromRef = document.getElementById('backFromRef');
     const kanaTable = document.getElementById('kanaTable');
 
 
@@ -620,13 +589,21 @@
       applyPreset(btn.getAttribute('data-preset'));
     });
 
+    document.addEventListener('DOMContentLoaded', () => {
+      document.addEventListener('click', (e) => {
+        const backBtn = e.target.closest('.js-back-menu');
+        if (backBtn) {
+          // show menu; hide all other screens
+          referenceScreen.classList.add('hidden');
+          scoreScreen.classList.add('hidden');
+          quizScreen.classList.add('hidden');
+          mainMenu.classList.remove('hidden');
+        }
+      });
+    });
+
     // ===== Flow =====
     startBtn.addEventListener('click', startQuiz);
-    backToMenu.addEventListener('click', () => {
-      scoreScreen.classList.add('hidden');
-      mainMenu.classList.remove('hidden');
-      revealArea.classList.add('hidden');
-    });
 
     function startQuiz() {
       const quizType = ($$('input[name="quizType"]:checked')[0] || {}).value || 'kataToRoma';
@@ -726,9 +703,7 @@
 
     function briefFeedback(ok) {
       feedbackEl.textContent = ok ? '✅' : '❌';
-      feedbackEl.className = FEEDBACK_BASE + ok
-        ? 'text-3xl font-semibold mb-4 text-green-400'
-        : 'text-3xl font-semibold mb-4 text-red-400';
+      feedbackEl.className = `${FEEDBACK_BASE} ${ok ? "text-green-400" : "text-red-400"}`;
     }
 
     function finishQuestionAndAdvance() {
@@ -873,17 +848,6 @@
     }
 
     // Reference chart
-    openReference.addEventListener('click', () => {
-      mainMenu.classList.add('hidden');
-      buildKanaTable();
-      referenceScreen.classList.remove('hidden');
-    });
-
-    backFromRef.addEventListener('click', () => {
-      referenceScreen.classList.add('hidden');
-      mainMenu.classList.remove('hidden');
-    });
-
     function escapeHTML(str) {
       return str.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', '\'': '&#39;' }[c]));
     }
@@ -945,7 +909,33 @@
       kanaTable.innerHTML = html;
     }
 
-  </script>
+  
+// Added by patch: make Kana Chart button work
+let kanaBuilt = false;
+if (typeof openReference !== 'undefined' && openReference) {
+  openReference.addEventListener('click', () => {
+    try {
+      if (!kanaBuilt && typeof buildKanaTable === 'function') { buildKanaTable(); kanaBuilt = true; }
+    } catch (e) { console.error('Error building kana table:', e); }
+    mainMenu.classList.add('hidden');
+    quizScreen.classList.add('hidden');
+    scoreScreen.classList.add('hidden');
+    referenceScreen.classList.remove('hidden');
+  });
+}
+
+
+// Added by patch: keep canvas crisp on resize when draw mode visible
+window.addEventListener('resize', () => {
+  try {
+    const wrap = document.getElementById('drawWrap');
+    if (wrap && !wrap.classList.contains('hidden') && typeof initCanvas === 'function') {
+      initCanvas();
+    }
+  } catch (e) { /* ignore */ }
+});
+
+</script>
 </body>
 
 </html>

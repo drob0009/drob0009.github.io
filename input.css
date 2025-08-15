@@ -1,0 +1,37 @@
+@import "tailwindcss";
+
+#drawCanvas {
+  touch-action: none;
+}
+
+.btn {
+  @apply inline-flex items-center justify-center rounded-xl font-semibold px-5 py-2 transition;
+}
+
+/* Strong call to action */
+.btn-primary {
+  @apply bg-blue-600 hover:bg-blue-500 text-white shadow-md;
+}
+
+/* Secondary / outlined */
+.btn-secondary {
+  @apply border border-gray-500 text-gray-200 hover:border-blue-400 hover:text-blue-300;
+}
+
+/* Ghost / subtle navigation */
+.btn-ghost {
+  @apply border border-gray-700 text-gray-300 hover:border-gray-500 hover:text-white;
+}
+
+
+.btn-danger {
+  @apply border border-gray-700 bg-red-600 text-white hover:bg-red-700;
+}
+
+.badge {
+  @apply rounded px-2 py-0.5 text-xs font-semibold;
+}
+
+.disabled {
+  @apply opacity-50 pointer-events-none;
+}
