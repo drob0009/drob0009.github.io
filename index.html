@@ -22,33 +22,40 @@
         <h2 class="text-xl font-semibold mb-3">Quiz Type</h2>
         <div class="grid sm:grid-cols-2 gap-3">
           <label class="flex items-center gap-3 border border-gray-700 rounded-xl p-3 cursor-pointer">
+            <input type="radio" name="quizType" value="mixedToRoma" class="w-4 h-4" checked>
+            <span>Mixed Kana (ひ/カ) ➜ Romaji</span>
+          </label>
+          <label
+            class="flex items-center gap-3 border border-gray-700 rounded-xl p-3 cursor-pointer sm:col-start-1 sm:row-start-2">
             <input type="radio" name="quizType" value="kataToRoma" class="w-4 h-4">
             <span>Katakana ➜ Romaji</span>
           </label>
-          <label class="flex items-center gap-3 border border-gray-700 rounded-xl p-3 cursor-pointer">
+          <label
+            class="flex items-center gap-3 border border-gray-700 rounded-xl p-3 cursor-pointer sm:col-start-2 sm:row-start-2">
             <input type="radio" name="quizType" value="hiraToRoma" class="w-4 h-4">
             <span>Hiragana ➜ Romaji</span>
           </label>
-          <label class="flex items-center gap-3 border border-gray-700 rounded-xl p-3 cursor-pointer">
-            <input type="radio" name="quizType" value="mixedToRoma" class="w-4 h-4">
-            <span>Mixed Kana (ひ/カ) ➜ Romaji</span>
-          </label>
-          <label class="flex items-center gap-3 border border-gray-700 rounded-xl p-3 cursor-pointer">
-            <input type="radio" name="quizType" value="hiraToKata" class="w-4 h-4">
-            <span>Hiragana ➜ Katakana</span>
-          </label>
-          <label class="flex items-center gap-3 border border-gray-700 rounded-xl p-3 cursor-pointer">
+          <label
+            class="flex items-center gap-3 border border-gray-700 rounded-xl p-3 cursor-pointer sm:col-start-1 sm:row-start-3">
             <input type="radio" name="quizType" value="kataToHira" class="w-4 h-4">
             <span>Katakana ➜ Hiragana</span>
           </label>
-          <label class="flex items-center gap-3 border border-gray-700 rounded-xl p-3 cursor-pointer">
-            <input type="radio" name="quizType" value="romaToHira" class="w-4 h-4">
-            <span>Romaji ➜ Hiragana</span>
+          <label
+            class="flex items-center gap-3 border border-gray-700 rounded-xl p-3 cursor-pointer sm:col-start-2 sm:row-start-3">
+            <input type="radio" name="quizType" value="hiraToKata" class="w-4 h-4">
+            <span>Hiragana ➜ Katakana</span>
           </label>
-          <label class="flex items-center gap-3 border border-gray-700 rounded-xl p-3 cursor-pointer">
+          <label
+            class="flex items-center gap-3 border border-gray-700 rounded-xl p-3 cursor-pointer sm:col-start-1 sm:row-start-4">
             <input type="radio" name="quizType" value="romaToKata" class="w-4 h-4">
             <span>Romaji ➜ Katakana</span>
           </label>
+          <label
+            class="flex items-center gap-3 border border-gray-700 rounded-xl p-3 cursor-pointer sm:col-start-2 sm:row-start-4">
+            <input type="radio" name="quizType" value="romaToHira" class="w-4 h-4">
+            <span>Romaji ➜ Hiragana</span>
+          </label>
+
         </div>
 
         <!-- Answer Mode -->
@@ -159,29 +166,44 @@
           </label>
 
           <!-- Yōon (aggregate) -->
-          <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer sm:col-span-3">
+          <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
             <input type="checkbox" class="charPool w-4 h-4" value="yoon" checked />
-            <span>Yōon (contracted ゃ/ゅ/ょ: kya, sha, cha, nya, etc.)</span>
+            <span>Yōon (kya, sha, cha, nya, etc.)</span>
           </label>
         </div>
 
+
         <!-- Presets -->
-        <div class="mt-5">
-          <h3 class="text-sm font-semibold mb-2 text-gray-300">Presets</h3>
-          <div class="flex flex-wrap gap-2">
-            <button type="button" class="btn btn-secondary text-sm px-3 py-1.5" data-preset="kst">K/S/T rows</button>
-            <button type="button" class="btn btn-secondary text-sm px-3 py-1.5" data-preset="vowelsY">Vowels +
-              Y</button>
-            <button type="button" class="btn btn-secondary text-sm px-3 py-1.5" data-preset="starters">Starters (Vowels
-              + K + S)</button>
-            <button type="button" class="btn btn-secondary text-sm px-3 py-1.5" data-preset="all">All Kana</button>
-            <button type="button" class="btn btn-secondary text-sm px-3 py-1.5" data-preset="clear">Clear all</button>
-          </div>
-          <p class="text-xs text-gray-500 mt-2">
-            Presets adjust the checkbox selection above. You can tweak further after applying.
-          </p>
+        <h3 class="text-sm font-semibold mb-2 text-gray-300">Presets</h3>
+
+        <!-- Buttons grid -->
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <button type="button" class="btn btn-secondary text-sm px-3 py-1.5" data-preset="kst">K/S/T rows</button>
+          <button type="button" class="btn btn-secondary text-sm px-3 py-1.5" data-preset="vowelsY">Vowels +
+            Y</button>
+          <button type="button" class="btn btn-secondary text-sm px-3 py-1.5" data-preset="starters">Starters
+            (Vowels
+            + K + S)</button>
+          <button type="button" class="btn btn-secondary text-sm px-3 py-1.5" data-preset="basics">Basics</button>
+
+          <button type="button" class="btn btn-secondary text-sm px-3 py-1.5" data-preset="dakuten">Dakuten</button>
+          <button type="button" class="btn btn-secondary text-sm px-3 py-1.5"
+            data-preset="handakuten">Handakuten</button>
+
+          <!-- Force this one to the start of row 3 at sm+ -->
+          <button type="button" class="btn btn-secondary text-sm px-3 py-1.5 sm:col-start-1 sm:row-start-3"
+            data-preset="all">All Kana</button>
+
+          <button type="button" class="btn btn-secondary text-sm px-3 py-1.5 sm:col-start-2 sm:row-start-3"
+            data-preset="clear">Clear all</button>
         </div>
       </div>
+
+      <p class="text-xs text-gray-500 mt-2">
+        Presets adjust the checkbox selection above. You can tweak further after applying.
+      </p>
+
 
       <!-- Repetitions + Question Count -->
       <div class="bg-gray-800 shadow-sm rounded-2xl p-5">
@@ -580,6 +602,8 @@
       poolCats: ['vowels', 'k', 's', 't', 'n', 'h', 'm', 'y', 'r', 'w', 'special', 'g', 'z', 'd', 'b', 'p', 'yoon'],
     };
 
+
+
     const questionPromptEl = document.getElementById('questionPrompt');
     const feedbackEl = document.getElementById('feedback');
     const FEEDBACK_BASE = 'h-7 text-2xl text-center transition-opacity duration-500';
@@ -606,6 +630,7 @@
     const qTotal = document.getElementById('qTotal');
 
     const modeText = document.getElementById('answerModeText');
+    const bigModeMCLabel = document.getElementById('modeMCLabel');
     const modeMC = document.getElementById('answerModeMC');
     const modeDraw = document.getElementById('answerModeDraw');
 
@@ -613,6 +638,8 @@
     const distractorSelectedOnly = document.getElementById('distractorSelectedOnly');
 
     const FADE_TARGETS = [questionPromptEl, feedbackEl, promptHint, textAnswerWrap, mcWrap, drawWrap];
+    let isFading = false;
+    const FADE_MS = 550;
 
     function showScreen(targetId) {
       ['mainMenu', 'quizScreen', 'scoreScreen', 'referenceScreen'].forEach(id => {
@@ -623,9 +650,9 @@
       });
     }
 
-    // Answer mode availability (same UI, no style changes)
+    // Answer mode availability
     function updateAnswerModeAvailability() {
-      const quizType = (document.querySelector('input[name="quizType"]:checked') || {}).value || 'kataToRoma';
+      const quizType = (document.querySelector('input[name="quizType"]:checked') || {}).value || 'mixedToRoma';
       const meta = selectedQuizMeta(quizType);
       // Typing always available
       modeText.disabled = false;
@@ -639,6 +666,8 @@
       document.getElementById('modeDrawLabel').classList.toggle('opacity-50', !drawOK);
       distractorRow.classList.toggle('hidden', !(meta.to !== 'romaji' && modeMC.checked));
       document.getElementById('distractorLabel').classList.toggle('opacity-50', !(meta.to !== 'romaji' && modeMC.checked));
+
+      // Recompute max questions when quiz type changes
       updateQuestionLimit(true);
     }
 
@@ -659,6 +688,9 @@
         case 'kst': setPools(['k', 's', 't']); break;
         case 'vowelsY': setPools(['vowels', 'y']); break;
         case 'starters': setPools(['vowels', 'k', 's']); break;
+        case 'basics': setPools(['vowels', 'k', 's', 't', 'n', 'h', 'm', 'y', 'r', 'w', 'special']); break;
+        case 'dakuten': setPools(['g', 'z', 'd', 'b']); break;
+        case 'handakuten': setPools(['p']); break;
         case 'all': setPools(ALL); break;
         case 'clear': setPools([]); break;
       }
@@ -678,7 +710,7 @@
         } else {
           state.poolCats = state.poolCats.filter(v => v !== cb.value);
         }
-        updateQuestionLimit(true); // set to new max whenever pools change
+        updateQuestionLimit(true);
       });
     });
 
@@ -686,38 +718,30 @@
     function computePoolSize() {
       return buildBaseSet(state.poolCats.slice()).length;
     }
-
+    function computeMaxQuestions() {
+      const quizType = (document.querySelector('input[name="quizType"]:checked') || {}).value || 'kataToRoma';
+      const reps = Math.max(1, parseInt(repsEl.value || '1', 10));
+      const baseSize = computePoolSize();
+      const factor = (selectedQuizMeta(quizType).from === 'mixedKana') ? 2 : 1;
+      return baseSize * factor * reps;
+    }
     function updateQuestionLimit(setValueToMax) {
       const max = computeMaxQuestions();
       maxQEl.textContent = max;
       qCountEl.max = String(max);
-
       if (setValueToMax) {
-        qCountEl.value = String(max);           // snap to new max on pool/reps/quiz change
+        qCountEl.value = String(max);
       } else {
         const cur = Math.max(0, parseInt(qCountEl.value || '0', 10));
         if (cur > max) qCountEl.value = String(max);
       }
-
       startQuizBtn.disabled = (max === 0);
       startQuizBtn.setAttribute('aria-disabled', String(max === 0));
     }
 
-    function computeMaxQuestions() {
-      const quizType = (document.querySelector('input[name="quizType"]:checked') || {}).value || 'kataToRoma';
-      const reps = Math.max(1, parseInt(repsEl.value || '1', 10));
-      const baseSize = computePoolSize(); // number of unique characters from current pools
-
-      // Mixed Kana asks each selected character twice (one ひ + one カ)
-      const factor = (selectedQuizMeta(quizType).from === 'mixedKana') ? 2 : 1;
-
-      return baseSize * factor * reps;
-    }
-
-
     // Reps and manual questionCount adjustments
-    repsEl.addEventListener('input', () => updateQuestionLimit(true)); // keep synced to max
-    qCountEl.addEventListener('input', () => updateQuestionLimit(false)); // clamp if needed
+    repsEl.addEventListener('input', () => updateQuestionLimit(true));
+    qCountEl.addEventListener('input', () => updateQuestionLimit(false));
 
     // Start / Back / Reference
     document.getElementById('startQuiz').addEventListener('click', () => {
@@ -757,7 +781,7 @@
       if (q.kind === 'text' && q.meta.to === 'romaji') {
         if (promptHint) promptHint.textContent = 'Type romaji (IME kbd or phonetic), Enter to submit';
       } else if (q.kind === 'mc') {
-        if (promptHint) promptHint.textContent = `Pick the correct ${q.meta.to}`;
+        if (promptHint) promptHint.textContent = `Pick the correct ${q.meta.to} (press 1–4)`;
       } else if (q.kind === 'draw') {
         if (promptHint) promptHint.textContent = `Draw the ${q.meta.to}`;
       } else {
@@ -803,7 +827,21 @@
       }
     });
 
-    // MC rendering
+    // Number key shortcuts for MC: 1–4
+    document.addEventListener('keydown', (e) => {
+      if (mcWrap.classList.contains('hidden') || isFading) return;
+      const key = e.key;
+      if (key === '1' || key === '2' || key === '3' || key === '4') {
+        const idx = parseInt(key, 10) - 1;
+        const btns = mcWrap.querySelectorAll('button');
+        if (btns[idx]) {
+          e.preventDefault();
+          btns[idx].click();
+        }
+      }
+    });
+
+    // MC rendering (adds numeric labels 1) .. 4))
     function renderMC(q) {
       mcWrap.innerHTML = '';
       const pool = buildBaseSet(state.poolCats.slice());
@@ -816,19 +854,34 @@
         q.meta.to === 'romaji' ? d.r : (q.meta.to === 'hiragana' ? d.h : d.k)
       )];
 
-      shuffle(options).forEach((opt) => {
+      shuffle(options).forEach((opt, i) => {
         const btn = document.createElement('button');
-        btn.className = 'btn btn-secondary';
-        btn.textContent = opt;
+        btn.className = 'btn btn-secondary inline-flex items-center gap-2';
+        btn.setAttribute('aria-label', `Option ${i + 1}: ${opt}`);
+
+        // Keycap: small gray boxed number (looks like a keyboard key)
+        const cap = document.createElement('span');
+        cap.className = 'ml-1 mr-3 my-0.5 inline-flex items-center justify-center w-6 h-6 rounded-md border border-gray-600 bg-gray-200 font-mono text-xs text-slate-900 shadow-sm';
+        cap.textContent = String(i + 1);
+
+        const label = document.createElement('span');
+        label.textContent = opt;
+
+        // Build button content without disturbing your base .btn style
+        btn.appendChild(cap);
+        btn.appendChild(label);
+
         btn.addEventListener('click', () => {
           const ok = (opt.toString().toLowerCase() === q.correct.toString().toLowerCase());
           if (!ok) state.wrong.push({ prompt: q.prompt, user: opt, correct: q.correct });
           else { state.score++; scoreNow.textContent = state.score; }
           showFeedbackAndAdvance(ok);
         });
+
         mcWrap.appendChild(btn);
       });
     }
+
 
     // Drawing mode
     let ctx, drawing = false, last = null;
@@ -876,8 +929,9 @@
 
     // Fade + feedback
     function fadeOutQA(cb) {
+      isFading = true;
       FADE_TARGETS.forEach(el => { if (el && !el.classList.contains('hidden')) el.style.opacity = '0'; });
-      setTimeout(cb, 550);
+      setTimeout(cb, FADE_MS);
     }
 
     function fadeInQA() {
@@ -885,6 +939,7 @@
       requestAnimationFrame(() => {
         FADE_TARGETS.forEach(el => { if (el && !el.classList.contains('hidden')) el.style.opacity = '1'; });
       });
+      setTimeout(() => { isFading = false; }, FADE_MS);
     }
 
     function setFeedbackEmpty() {
