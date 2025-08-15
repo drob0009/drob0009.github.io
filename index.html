@@ -123,49 +123,49 @@
         <div class="grid sm:grid-cols-3 gap-3">
           <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
             <input type="checkbox" class="charPool w-4 h-4" value="vowels" checked />
-            <span>Vowels (あ、い、う、え、お)</span>
+            <span>Vowels (a, i, u, e, o)</span>
           </label>
 
           <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
             <input type="checkbox" class="charPool w-4 h-4" value="k" checked />
-            <span>K row (か、き、く、け、こ)</span>
+            <span>K row (ka, ki, ku, ke, ko)</span>
           </label>
           <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
             <input type="checkbox" class="charPool w-4 h-4" value="s" checked />
-            <span>S row (さ、し、す、せ、そ)</span>
+            <span>S row (sa, shi, su, se, so)</span>
           </label>
           <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
             <input type="checkbox" class="charPool w-4 h-4" value="t" checked />
-            <span>T row (た、ち、つ、て、と)</span>
+            <span>T row (ta, chi, tsu, te, to)</span>
           </label>
           <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
             <input type="checkbox" class="charPool w-4 h-4" value="n" checked />
-            <span>N row (な、に、ぬ、ね、の)</span>
+            <span>N row (na, ni, nu, ne, no)</span>
           </label>
           <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
             <input type="checkbox" class="charPool w-4 h-4" value="h" checked />
-            <span>H row (は、ひ、ふ、へ、ほ)</span>
+            <span>H row (ha, hi, fu, he, ho)</span>
           </label>
           <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
             <input type="checkbox" class="charPool w-4 h-4" value="m" checked />
-            <span>M row (ま、み、む、め、も)</span>
+            <span>M row (ma, mi, mu, me, mo)</span>
           </label>
           <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
             <input type="checkbox" class="charPool w-4 h-4" value="y" checked />
-            <span>Y row (や、ゆ、よ)</span>
+            <span>Y row (ya, yu, yo)</span>
           </label>
           <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
             <input type="checkbox" class="charPool w-4 h-4" value="r" checked />
-            <span>R row (ら、り、る、れ、ろ)</span>
+            <span>R row (ra, ri, ru, re, ro)</span>
           </label>
           <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
             <input type="checkbox" class="charPool w-4 h-4" value="w" checked />
-            <span>W row (わ、を)</span>
+            <span>W row (wa, wo)</span>
           </label>
 
           <label class="flex items-center gap-2 border border-gray-700 rounded-xl p-3 cursor-pointer">
             <input type="checkbox" class="charPool w-4 h-4" value="special" />
-            <span>Special (ん)</span>
+            <span>Special (n)</span>
           </label>
         </div>
 
@@ -198,6 +198,7 @@
       </div>
 
       <div class="flex justify-end">
+        <button id="openReference" class="btn btn-secondary w-full sm:w-auto">Kana Chart</button>
         <button id="startQuiz" class="btn btn-primary w-full sm:w-auto">Start Quiz</button>
       </div>
     </section>
@@ -258,6 +259,31 @@
       </div>
     </section>
   </div>
+  <section id="referenceScreen" class="hidden">
+    <div class="bg-gray-800 shadow-sm rounded-2xl p-5">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-2xl font-bold">Kana Chart</h2>
+        <button id="backFromRef" class="btn btn-secondary">Back to Menu</button>
+      </div>
+
+      <p class="text-sm text-gray-400 mb-3">
+        Basic gojūon (no dakuten/handakuten). Each cell shows <span class="font-semibold">hiragana</span> / <span
+          class="font-semibold">katakana</span> with romaji.
+      </p>
+
+      <div id="kanaTable" class="overflow-x-auto"></div>
+
+      <div class="mt-4">
+        <div class="inline-flex items-center gap-2 border border-gray-700 rounded-xl px-3 py-2">
+          <span class="text-sm text-gray-300">Special:</span>
+          <span class="text-xl">ん</span>
+          <span class="text-xl">/</span>
+          <span class="text-xl">ン</span>
+          <span class="text-sm text-gray-400">(n)</span>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <script>
     // ===== Data =====
@@ -417,6 +443,12 @@
     const scoreSummary = $('#scoreSummary');
     const wrongAnswersDiv = $('#wrongAnswers');
     const backToMenu = $('#backToMenu');
+
+    const referenceScreen = document.getElementById('referenceScreen');
+    const openReference = document.getElementById('openReference');
+    const backFromRef = document.getElementById('backFromRef');
+    const kanaTable = document.getElementById('kanaTable');
+
 
     // Answer mode radios + labels
     const modeText = $('#answerModeText');
@@ -840,11 +872,80 @@
       }
     }
 
+    // Reference chart
+    openReference.addEventListener('click', () => {
+      mainMenu.classList.add('hidden');
+      buildKanaTable();
+      referenceScreen.classList.remove('hidden');
+    });
+
+    backFromRef.addEventListener('click', () => {
+      referenceScreen.classList.add('hidden');
+      mainMenu.classList.remove('hidden');
+    });
+
     function escapeHTML(str) {
       return str.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', '\'': '&#39;' }[c]));
     }
+
+    function buildKanaTable() {
+      // Index by romaji for quick lookup
+      const byR = Object.fromEntries(KANA.map(k => [k.r, k]));
+
+      // Column order
+      const V = ['a', 'i', 'u', 'e', 'o'];
+
+      // Rows with explicit romaji for each column (null = empty cell)
+      const GOJUON = [
+        { label: '—', name: 'vowels', seq: ['a', 'i', 'u', 'e', 'o'] },
+        { label: 'K', name: 'k', seq: ['ka', 'ki', 'ku', 'ke', 'ko'] },
+        { label: 'S', name: 's', seq: ['sa', 'shi', 'su', 'se', 'so'] },
+        { label: 'T', name: 't', seq: ['ta', 'chi', 'tsu', 'te', 'to'] },
+        { label: 'N', name: 'n', seq: ['na', 'ni', 'nu', 'ne', 'no'] },
+        { label: 'H', name: 'h', seq: ['ha', 'hi', 'fu', 'he', 'ho'] },
+        { label: 'M', name: 'm', seq: ['ma', 'mi', 'mu', 'me', 'mo'] },
+        { label: 'Y', name: 'y', seq: ['ya', null, 'yu', null, 'yo'] },
+        { label: 'R', name: 'r', seq: ['ra', 'ri', 'ru', 're', 'ro'] },
+        { label: 'W', name: 'w', seq: ['wa', null, null, null, 'wo'] },
+      ];
+
+      // Build table HTML
+      let html = `
+    <table class="w-full border border-gray-700 rounded-xl overflow-hidden text-left">
+      <thead class="bg-gray-900">
+        <tr>
+          <th class="px-3 py-2 text-xs font-semibold text-gray-400 border-b border-gray-700 w-14">Row</th>
+          ${V.map(v => `<th class="px-3 py-2 text-xs font-semibold text-gray-400 border-b border-gray-700 uppercase">${v}</th>`).join('')}
+        </tr>
+      </thead>
+      <tbody>
+        ${GOJUON.map(row => `
+          <tr class="hover:bg-gray-800/60">
+            <th class="px-3 py-2 text-sm text-gray-300 border-t border-gray-700">${row.label}</th>
+            ${row.seq.map(r => {
+        if (!r) return `<td class="px-3 py-3 border-t border-gray-700 text-gray-600">—</td>`;
+        const k = byR[r];
+        if (!k) return `<td class="px-3 py-3 border-t border-gray-700 text-gray-600">—</td>`;
+        return `
+                <td class="px-3 py-3 border-t border-gray-700 align-middle">
+                  <div class="flex items-baseline gap-3">
+                    <div class="text-2xl">${k.h}</div>
+                    <div class="text-2xl">${k.k}</div>
+                    <div class="text-xs text-gray-400">${k.r}</div>
+                  </div>
+                </td>
+              `;
+      }).join('')}
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+
+      kanaTable.innerHTML = html;
+    }
+
   </script>
 </body>
 
 </html>
-
