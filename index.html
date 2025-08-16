@@ -669,13 +669,12 @@
 
     // const FADE_TARGETS = [questionPromptEl, feedbackEl, promptHint, textAnswerWrap, mcWrap, drawWrap];
 
-
-    let isFading = false;
-    const FADE_MS = 550;
+    let isDisabled = false;
+    const FADE_MS = 300;
 
     const recentList = document.getElementById('recentList');
     const RECENT_MAX = 5;
-    const RECENT_FADE_MS = 550;
+    const RECENT_FADE_MS = 200;
 
     // ===== SFX (Web Audio, no assets) =====
     let audioCtx = null;
@@ -991,6 +990,8 @@
       qTotal.textContent = state.questions.length;
       scoreNow.textContent = 0;
 
+      getFadeTargets
+
       showScreen('quizScreen');
       showQuestion();
       fadeInQA();
@@ -1060,7 +1061,8 @@
 
     // Number key shortcuts for MC: 1–4
     document.addEventListener('keydown', (e) => {
-      if (!state.active || mcWrap.classList.contains('hidden') || isFading) return;
+      if (!state.active || mcWrap.classList.contains('hidden') || isDisabled) return;
+      isDisabled = true; // Switched again in FadeInQA();
       const key = e.key;
       if (key === '1' || key === '2' || key === '3' || key === '4') {
         const idx = parseInt(key, 10) - 1;
@@ -1175,20 +1177,19 @@
     }
 
     function fadeOutQA(cb) {
-      isFading = true;
       const myToken = runToken;
       const targets = getFadeTargets();
-      targets.forEach(el => { el.style.opacity = '0'; });
+      targets.forEach(el => { el.style.transitionDuration = `${FADE_MS}ms`; el.style.opacity = '0'; });
       addTimer(setTimeout(() => { if (state.active && myToken === runToken) cb?.(); }, FADE_MS));
     }
 
     function fadeInQA() {
       const targets = getFadeTargets();
-      targets.forEach(el => { el.style.opacity = '0'; });
+      targets.forEach(el => { el.style.transitionDuration = `${FADE_MS}ms`; el.style.opacity = '0'; });
       requestAnimationFrame(() => {
-        targets.forEach(el => { el.style.opacity = '1'; });
+        targets.forEach(el => { el.style.transitionDuration = `${FADE_MS}ms`; el.style.opacity = '1'; });
       });
-      addTimer(setTimeout(() => { isFading = false; }, FADE_MS));
+      addTimer(setTimeout(() => { isDisabled = false; }, FADE_MS));
     }
 
     function setFeedbackEmpty() {
@@ -1206,7 +1207,7 @@
     }
 
     function submitTypingAnswer() {
-      if (!state.active || textAnswerWrap.classList.contains('hidden') || isFading) return;
+      if (!state.active || textAnswerWrap.classList.contains('hidden')) return;
       const q = state.questions[state.index];
       const userRaw = (textAnswer.value || '').trim();
       const user = userRaw.toLowerCase();
