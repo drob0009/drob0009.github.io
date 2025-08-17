@@ -1218,6 +1218,10 @@
       const ok = q.acceptable instanceof Set
         ? q.acceptable.has(user)
         : user === correct.toLowerCase();
+      if (user === '') {
+        isDisabled = false;
+        return;
+      }
       textAnswer.value = '';
       textAnswer.focus();
       postSubmit({ q, user: userRaw, ok });
