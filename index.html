@@ -1052,8 +1052,9 @@
 
     // Typing submit (accept kbd/phon variants)
     document.addEventListener('keydown', (e) => {
-      if (!state.active) return;
+      if (!state.active || isDisabled) return;
       if (e.key === 'Enter' && !textAnswerWrap.classList.contains('hidden')) {
+        isDisabled = true;
         e.preventDefault();
         submitTypingAnswer();
       }
@@ -1062,7 +1063,6 @@
     // Number key shortcuts for MC: 1–4
     document.addEventListener('keydown', (e) => {
       if (!state.active || mcWrap.classList.contains('hidden') || isDisabled) return;
-      isDisabled = true; // Switched again in FadeInQA();
       const key = e.key;
       if (key === '1' || key === '2' || key === '3' || key === '4') {
         const idx = parseInt(key, 10) - 1;
@@ -1105,7 +1105,8 @@
         btn.appendChild(label);
 
         btn.addEventListener('click', () => {
-          if (!state.active) return;
+          if (!state.active || isDisabled) return;
+          isDisabled = true;
           const qNow = state.questions[state.index];
           const chosen = String(opt);
           const ok = (chosen.toLowerCase() === String(qNow.correct).toLowerCase());
@@ -1152,11 +1153,13 @@
       };
       document.getElementById('selfMarkRight').onclick = () => {
         if (!state.active) return;
+        isDisabled = true;
         const q = state.questions[state.index];
         postSubmit({ q, user: '[draw]', ok: true });
       };
       document.getElementById('selfMarkWrong').onclick = () => {
         if (!state.active) return;
+        isDisabled = true;
         const q = state.questions[state.index];
         postSubmit({ q, user: '[draw]', ok: false });
       };
@@ -1270,7 +1273,8 @@
     }
 
     document.getElementById('nextQ').addEventListener('click', () => {
-      if (!state.active) return;
+      if (!state.active  || isDisabled) return;
+      isDisabled = true;
       // If we're in Typing mode, Next should behave like pressing Enter.
       if (!textAnswerWrap.classList.contains('hidden')) {
         submitTypingAnswer();
